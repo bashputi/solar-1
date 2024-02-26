@@ -1,9 +1,16 @@
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { Password } from "primereact/password";
+import 'primeicons/primeicons.css';
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import { useState } from "react";
 
 
 const Register = () => {
     const { register, handleSubmit,  formState: { errors }, } = useForm();
+    const [value, setValue] = useState('');
+    console.log(value)
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
   <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -20,7 +27,7 @@ const Register = () => {
   <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md lg:max-w-2xl">
     <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
       <form className="space-y-6" action="#" method="POST">
-     <div className=" flex gap-3">
+     <div className=" lg:flex gap-3">
      <div className="flex-1">
               <label htmlFor="text" className="block text-gray-800 font-bold">
                    First Name
@@ -33,7 +40,7 @@ const Register = () => {
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
                 />  {errors.firstname && <p role="alert" className='text-red-600'>{errors.firstname.message}</p>}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 sm:mt-5 lg:mt-0">
               <label htmlFor="text" className="block text-gray-800 font-bold">
                    Last Name
                 </label>
@@ -63,6 +70,15 @@ const Register = () => {
                     <label htmlFor="password" className="block text-gray-800 font-bold">
                     Password
                     </label>
+                    
+                   
+            <Password toggleMask onChange={(e) => setValue(e.target.value)}
+                weakLabel="Weak" mediumLabel="Medium" strongLabel="Strong"
+                {...register("password", { required: "Password is required" })}
+                    aria-invalid={errors.password ? "true" : "false"}
+                    className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+                />{errors.password && <p role="alert" className='text-red-600'>{errors.password.message}</p>}
+       
                     <input
                 
                     type="password"
