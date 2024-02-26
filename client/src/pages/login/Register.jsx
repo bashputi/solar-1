@@ -1,16 +1,16 @@
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Password } from "primereact/password";
-import 'primeicons/primeicons.css';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import 'primereact/resources/primereact.min.css';
-import { useState } from "react";
+import 'primereact/resources/themes/tailwind-light/theme.css';
+import ReCAPTCHA from "react-google-recaptcha";
+
+
+
 
 
 const Register = () => {
     const { register, handleSubmit,  formState: { errors }, } = useForm();
-    const [value, setValue] = useState('');
-    console.log(value)
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
   <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -34,7 +34,7 @@ const Register = () => {
                 </label>
                 <input
                     type="text"
-                    placeholder="first name"
+                    placeholder="First name"
                     {...register("firstname", { required: "First Name is required" })}
                     aria-invalid={errors.firstname ? "true" : "false"}
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
@@ -46,13 +46,25 @@ const Register = () => {
                 </label>
                 <input
                     type="text"
-                    placeholder="last name"
+                    placeholder="Last name"
                     {...register("lastname", { required: "Last Name is required" })}
                     aria-invalid={errors.lastname ? "true" : "false"}
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
                 />  {errors.lastname && <p role="alert" className='text-red-600'>{errors.lastname.message}</p>}
               </div>
      </div>
+     <div >
+              <label htmlFor="text" className="block text-gray-800 font-bold">
+                   User Name
+                </label>
+                <input
+                    type="text"
+                    placeholder="User name"
+                    {...register("username", { required: "User Name is required" })}
+                    aria-invalid={errors.username ? "true" : "false"}
+                    className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+                />  {errors.username && <p role="alert" className='text-red-600'>{errors.username.message}</p>}
+              </div>
                 <div>
                     <label htmlFor="email" className="block text-gray-800 font-bold">
                     Email
@@ -66,35 +78,40 @@ const Register = () => {
                     />
                   {errors.email && <p role="alert" className='text-red-600'>{errors.email.message}</p>}
                 </div>
-                <div>
+            <div className=" lg:flex gap-3">
+            <div className="flex-1">
                     <label htmlFor="password" className="block text-gray-800 font-bold">
-                    Password
-                    </label>
-                    
-                   
-            <Password toggleMask onChange={(e) => setValue(e.target.value)}
+                   Create Password
+                    </label>   
+            <Password toggleMask 
                 weakLabel="Weak" mediumLabel="Medium" strongLabel="Strong"
+                
                 {...register("password", { required: "Password is required" })}
                     aria-invalid={errors.password ? "true" : "false"}
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
                 />{errors.password && <p role="alert" className='text-red-600'>{errors.password.message}</p>}
-       
+                    </div>
+                    <div className="flex-1 sm:mt-5 lg:mt-0">
+                    <label htmlFor="password" className="block text-gray-800 font-bold">
+                   Confirm Password
+                    </label>
                     <input
                 
                     type="password"
   
-                    placeholder="password"
-                    {...register("password", { required: "Password is required" })}
-                    aria-invalid={errors.password ? "true" : "false"}
+                    placeholder="Confirm password"
+                    {...register("confirmpassword", { required: "Confirm Password is required" })}
+                    aria-invalid={errors.confirmpassword ? "true" : "false"}
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
-                    />  {errors.password && <p role="alert" className='text-red-600'>{errors.password.message}</p>}
+                    />  {errors.confirmpassword && <p role="alert" className='text-red-600'>{errors.confirmpassword.message}</p>}
                 
                     </div>
-     
+            </div>
+            <ReCAPTCHA sitekey="6Lfyl4ApAAAAAO_GLBuMsse4kGbtap2eP3-tVBbi"/>
         <div>
           <button
             type="submit"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Sign in
           </button>
         </div>
