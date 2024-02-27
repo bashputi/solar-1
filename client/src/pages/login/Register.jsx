@@ -29,7 +29,7 @@ const Register = () => {
             email: data.email,
             password: data.confirmpassword
         }
-        fetch('http://localhost:3001/register',{
+        fetch('http://localhost:3001/users/register',{
             method: 'POST',
             headers: {
               'content-type': 'application/json'
@@ -39,7 +39,7 @@ const Register = () => {
         .then(res => res.json())
         .then(data => {
             if(data.success){
-                toast.success("Registration successful!", {
+                toast.success(data.message, {
                   position: "top-right",
                   autoClose: 3000,
                   hideProgressBar: false,
@@ -49,7 +49,7 @@ const Register = () => {
                 });
             }else if(data.status === 400){
             
-                toast.error("Already Have an Account!!", {
+                toast.error(data.message, {
                   position: "top-right",
                   autoClose: 3000,
                   hideProgressBar: false,

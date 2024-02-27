@@ -26,7 +26,7 @@ const Login = () => {
           console.log(data);
           if (data.success) {
             location.reload();
-            router.push("/");
+            
   
             toast.success("LogIn successful!", {
               position: "top-right",
