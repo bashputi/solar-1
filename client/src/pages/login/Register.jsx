@@ -3,13 +3,74 @@ import { Link } from "react-router-dom";
 import { Password } from "primereact/password";
 import 'primereact/resources/themes/tailwind-light/theme.css';
 import ReCAPTCHA from "react-google-recaptcha";
+import { useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 
 
 
 const Register = () => {
+    const [password, setPassword] = useState('');
+    console.log(password)
     const { register, handleSubmit,  formState: { errors }, } = useForm();
+
+    const onSubmit = async(data) => {
+        console.log(data)
+        console.log(password)
+       
+        if(data.confirmpassword === password){
+        const Item = {
+            firstname: data.firstname,
+            lastname: data.lastname,
+            username: data.username,
+            email: data.email,
+            password: data.confirmpassword
+        }
+        fetch('http://localhost:3001/register',{
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json'
+            },
+            body: JSON.stringify(Item)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                toast.success("Registration successful!", {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                });
+            }else if(data.status === 400){
+            
+                toast.error("Already Have an Account!!", {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                });
+              }
+            })
+           
+        }else{
+            toast.error("Passwords should match eatch other!! Try again", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+              });
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -26,7 +87,7 @@ const Register = () => {
   </div>
   <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md lg:max-w-2xl">
     <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-      <form className="space-y-6" action="#" method="POST">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" >
      <div className=" lg:flex gap-3">
      <div className="flex-1">
               <label htmlFor="text" className="block text-gray-800 font-bold">
@@ -57,7 +118,7 @@ const Register = () => {
               <label htmlFor="text" className="block text-gray-800 font-bold">
                    User Name
                 </label>
-                <input
+                <input 
                     type="text"
                     placeholder="User name"
                     {...register("username", { required: "User Name is required" })}
@@ -70,8 +131,10 @@ const Register = () => {
                     Email
                     </label>
                     <input
+                    id="email"
+                    name="email"
                     type="email"
-                    placeholder="@email"
+                    placeholder="Enter a valid email"
                     {...register("email", { required: "Email Address is required" })}
         aria-invalid={errors.email ? "true" : "false"}
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
@@ -85,11 +148,9 @@ const Register = () => {
                     </label>   
             <Password toggleMask 
                 weakLabel="Weak" mediumLabel="Medium" strongLabel="Strong"
-                
-                {...register("password", { required: "Password is required" })}
-                    aria-invalid={errors.password ? "true" : "false"}
+                onChange={(e) => setPassword(e.target.value)}
                     className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
-                />{errors.password && <p role="alert" className='text-red-600'>{errors.password.message}</p>}
+                />
                     </div>
                     <div className="flex-1 sm:mt-5 lg:mt-0">
                     <label htmlFor="password" className="block text-gray-800 font-bold">
@@ -109,10 +170,8 @@ const Register = () => {
             </div>
             <ReCAPTCHA sitekey="6Lfyl4ApAAAAAO_GLBuMsse4kGbtap2eP3-tVBbi"/>
         <div>
-          <button
-            type="submit"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Sign in
+          <button className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Register
           </button>
         </div>
       </form>
@@ -123,10 +182,11 @@ const Register = () => {
           </div>
         
         </div>
-    
+        <ToastContainer />
       </div>
     </div>
   </div>
+  
 </div>
 
     );
