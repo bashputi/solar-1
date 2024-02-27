@@ -2,9 +2,11 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 
 
 const Login = () => {
+  const navigate = useNavigate();
     const handleLogin = async(e) => {
         e.preventDefault();
     const form = e.target;
@@ -13,31 +15,29 @@ const Login = () => {
         password: form.password.value
     };
     console.log(Item)
-    await fetch("http://localhost:3001/login", {
+    await fetch("http://localhost:3001/users/login", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify(Item),
-        credentials: "include",
       })
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
           if (data.success) {
-            location.reload();
-            
-  
-            toast.success("LogIn successful!", {
+
+            toast.success(data.message, {
               position: "top-right",
               autoClose: 3000,
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
+              onClose: () => navigate('/')
             });
           } else if (data.status === 400) {
-            toast.error("User Doesn't Exist!!", {
+            toast.error(data.message, {
               position: "top-right",
               autoClose: 2500,
               hideProgressBar: false,
@@ -45,14 +45,7 @@ const Login = () => {
               pauseOnHover: true,
               draggable: true,
             });
-            toast.error("Please Check your Email/Password", {
-              position: "top-right",
-              autoClose: 3500,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-            });
+         
           }
         });
     };

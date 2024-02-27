@@ -6,13 +6,13 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import { useNavigate } from "react-router-dom";
 
 
 
 
 const Register = () => {
+  const navigate = useNavigate();
     const [password, setPassword] = useState('');
     console.log(password)
     const { register, handleSubmit,  formState: { errors }, } = useForm();
@@ -46,6 +46,7 @@ const Register = () => {
                   closeOnClick: true,
                   pauseOnHover: true,
                   draggable: true,
+                  onClose: () => navigate('/login')
                 });
             }else if(data.status === 400){
             
