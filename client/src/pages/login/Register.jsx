@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import GoogleLoginButton from "../../component/GoogleLoginButton";
+import FacebookButton from "../../component/FacebookButton";
 
 
 
@@ -176,7 +177,7 @@ const Register = () => {
                 
                     </div>
             </div>
-            <ReCAPTCHA sitekey="6Lfyl4ApAAAAAO_GLBuMsse4kGbtap2eP3-tVBbi"/>
+            <ReCAPTCHA sitekey="6Lfo8IIpAAAAAImpxGwB5apeC3mAPGyhUfkLmi86"/>
         <div>
           <button className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Register
@@ -199,8 +200,12 @@ const Register = () => {
               <div className="mt-6 flex justify-center">
                 
                 <GoogleLoginButton />
-         
-               
+    
+              </div>
+              <div className="mt-6  flex justify-center">
+                
+                <FacebookButton />
+    
               </div>
             </div>
         

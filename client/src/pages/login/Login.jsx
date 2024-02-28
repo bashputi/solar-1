@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import GoogleLoginButton from "../../component/GoogleLoginButton";
+import FacebookButton from "../../component/FacebookButton";
 
 
 const Login = () => {
@@ -109,7 +110,7 @@ const Login = () => {
                   />
                 </div>
                <div className="mt-6">
-               <ReCAPTCHA sitekey="6Lfyl4ApAAAAAO_GLBuMsse4kGbtap2eP3-tVBbi"/>
+               <ReCAPTCHA sitekey="6Lfo8IIpAAAAAImpxGwB5apeC3mAPGyhUfkLmi86"/>
                </div>
               </div>
               {/* <div className="flex items-center justify-between">
@@ -154,9 +155,15 @@ const Login = () => {
                   </span>
                 </div>
               </div>
-              <div className="mt-6 pl-20">
+              <div className="mt-6 flex justify-center">
                 
                 <GoogleLoginButton />
+         
+               
+              </div>
+              <div className="mt-6 flex justify-center">
+                
+                <FacebookButton />
          
                
               </div>

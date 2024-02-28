@@ -149,6 +149,7 @@ app.post("/users/login", async(req, res) => {
 app.post("/users/google", async(req, res) => {
     try {
         let {firstname, lastname, username, email, password} = req.body;
+        console.log({firstname, lastname, username, email, password})
         const id = uuidv4();
         let hashedPassword = await bcrypt.hash(password, 10);
        
