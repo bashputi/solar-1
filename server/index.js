@@ -14,7 +14,13 @@ app.use(express.json());
 app.listen(PORT, () =>{
     console.log(`Server is running at port:${PORT}`);
 });
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://versed-yard.surge.sh',
+        'http://localhost:5173'
+    ],
+    Credential: true
+}));
 
 
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
