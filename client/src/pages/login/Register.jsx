@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import GoogleLoginButton from "../../component/GoogleLoginButton";
 
 
 
@@ -18,60 +19,66 @@ const Register = () => {
     const { register, handleSubmit,  formState: { errors }, } = useForm();
 
     const onSubmit = async(data) => {
-        console.log(data)
-        console.log(password)
-       
-        if(data.confirmpassword === password){
-        const Item = {
-            firstname: data.firstname,
-            lastname: data.lastname,
-            username: data.username,
-            email: data.email,
-            password: data.confirmpassword
-        }
-        fetch('http://localhost:3001/users/register',{
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json'
-            },
-            body: JSON.stringify(Item)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success){
-                toast.success(data.message, {
-                  position: "top-right",
-                  autoClose: 3000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  onClose: () => navigate('/login')
-                });
-            }else if(data.status === 400){
-            
-                toast.error(data.message, {
-                  position: "top-right",
-                  autoClose: 3000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                });
+      console.log(data)
+      console.log(password)
+      if(password.length < 6){
+          toast.error("Password must be at least 6 characters long", {
+              position: "top-center",
+              autoClose: 3000,
+          });
+      } else {
+          if(data.confirmpassword === password){
+              const Item = {
+                  firstname: data.firstname,
+                  lastname: data.lastname,
+                  username: data.username,
+                  email: data.email,
+                  password: data.confirmpassword
               }
-            })
-           
-        }else{
-            toast.error("Passwords should match eatch other!! Try again", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
+  
+              console.log(Item)
+              fetch('http://localhost:3001/users/register',{
+                  method: 'POST',
+                  headers: {
+                      'content-type': 'application/json'
+                  },
+                  body: JSON.stringify(Item)
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if(data.success){
+                      toast.success(data.message, {
+                          position: "top-right",
+                          autoClose: 3000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                          onClose: () => navigate('/login')
+                      });
+                  } else if(data.status === 400){
+                      toast.error(data.message, {
+                          position: "top-right",
+                          autoClose: 3000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                      });
+                  }
+              })
+          } else {
+              toast.error("Passwords should match each other!! Try again", {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
               });
-        }
-    };
+          }
+      }
+  };
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -178,16 +185,31 @@ const Register = () => {
       </form>
       <div className="mt-6">
         <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-          
-          </div>
+        <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-100 text-gray-500">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-center">
+                
+                <GoogleLoginButton />
+         
+               
+              </div>
+            </div>
         
         </div>
-        <ToastContainer />
+      
       </div>
     </div>
   </div>
-  
+  <ToastContainer />
 </div>
 
     );

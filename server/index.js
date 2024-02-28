@@ -2,6 +2,9 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+
 
 const pool = require("./db");
 const app = express();
@@ -12,6 +15,11 @@ app.listen(PORT, () =>{
     console.log(`Server is running at port:${PORT}`);
 });
 app.use(cors());
+
+
+const secretKey = process.env.ACCESS_TOKEN_SECRET;
+
+
 app.get('/', (req, res) => {
     res.send("hello");
 });
@@ -76,7 +84,8 @@ app.post("/users/register", async(req, res) => {
     }
     });
 
-    app.post("/users/login", async(req, res) => {
+// POST /login 
+app.post("/users/login", async(req, res) => {
         try {
             let {email, password} = req.body;
             console.log({email, password});
@@ -100,8 +109,11 @@ app.post("/users/register", async(req, res) => {
                         console.log("pass not compared", err);
                     }
                     if(isMatch){
+                        const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
+                         console.log(token)
                         console.log('matched')
                         res.status(200).json({
+                            token ,
                             status: 201,
                             success: true,
                             message: "Logged in Successfully",
@@ -131,4 +143,81 @@ app.post("/users/register", async(req, res) => {
         } catch (error) {
             res.json({error: error.message});
         }
-    })
+    });
+
+//google login
+app.post("/users/google", async(req, res) => {
+    try {
+        let {firstname, lastname, username, email, password} = req.body;
+        const id = uuidv4();
+        let hashedPassword = await bcrypt.hash(password, 10);
+       
+    pool.query(
+        `SELECT * FROM users
+        WHERE email = $1`,
+        [email],(err, results) => {
+            if(err){
+                console.log('server error')
+            }
+            console.log(results.rows);
+            if(results.rows.length > 0){
+
+            const user = results.rows[0];
+       
+         
+           bcrypt.compare(password, user.password, (err, isMatch) => {
+            if(err){
+                console.log("pass not compared", err);
+            }
+            if(isMatch){
+                const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
+          
+                res.status(200).json({
+                    token ,
+                    status: 201,
+                    success: true,
+                    message: "Logged in Successfully",
+                  });
+
+            }
+           })
+
+            }else{
+              
+                pool.query(
+                    `INSERT INTO users (id, firstname, lastname, username, email, password )
+                    VALUES ($1, $2, $3, $4, $5, $6)
+                    returning *`, [id, firstname, lastname, username, email, hashedPassword],
+                    (err, results) => {
+                        if (err){
+                            throw err;
+                        }
+                        if(results.rows.length > 0){
+                            const user = results.rows[0];
+                            console.log(user)
+                            const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
+               
+                            res.status(200).json({
+                                token,
+                                status: 201,
+                                success: true,
+                                message: "User Created Successfully",
+                              });
+                        }
+  
+                    }
+                )
+            }
+        }
+    )
+
+
+    } catch (error) {
+        res.json({error: error.message});
+    }
+});
+
+
+
+  
+ 
