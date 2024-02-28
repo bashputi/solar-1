@@ -14,13 +14,14 @@ app.use(express.json());
 app.listen(PORT, () =>{
     console.log(`Server is running at port:${PORT}`);
 });
-// app.use(cors({
-//     origin: [
-//         'https://versed-yard.surge.sh',
-//         'http://localhost:5173'
-//     ],
-//     Credential: true
-// }));
+
+app.use(cors({
+    origin: [
+        'https://versed-yard.surge.sh',
+        'http://localhost:5173'
+    ],
+    Credential: true
+}));
 // const corsOptions = {
 //     origin: ['http://localhost:5173','https://versed-yard.surge.sh'],
 //     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -28,7 +29,7 @@ app.listen(PORT, () =>{
 //     optionsSuccessStatus: 204,
 //   };
   
-  app.use(cors(corsOptions));
+//   app.use(cors(corsOptions));
 
 
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
@@ -187,9 +188,9 @@ app.post("/users/google", async(req, res) => {
             if(isMatch){
                 const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
           
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
-                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                // res.setHeader('Access-Control-Allow-Origin', '*');
+                // res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
+                // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         
                 res.status(200).json({
                     token,
@@ -199,9 +200,9 @@ app.post("/users/google", async(req, res) => {
                 });
 
             }else{
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
-                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                // res.setHeader('Access-Control-Allow-Origin', '*');
+                // res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
+                // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
                 res.status(400).json({
                     status: 400,
@@ -227,9 +228,9 @@ app.post("/users/google", async(req, res) => {
                             console.log(user)
                             const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
                
-                            res.setHeader('Access-Control-Allow-Origin', '*');
-                            res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
-                            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                            // res.setHeader('Access-Control-Allow-Origin', '*');
+                            // res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
+                            // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
                            
                             res.status(200).json({
                                 token,
