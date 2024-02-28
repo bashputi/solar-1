@@ -180,7 +180,14 @@ app.post("/users/google", async(req, res) => {
                     message: "Logged in Successfully",
                   });
 
+            }else{
+                res.status(400).json({
+                    status: 400,
+                    message: "Email already used!!",
+                  });
+                  return;
             }
+            
            })
 
             }else{
