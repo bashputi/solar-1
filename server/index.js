@@ -1,9 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-// const cors = require('cors');
+const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+
+const { Client } = require('@vercel/postgres');
 
 
 const pool = require("./db");
@@ -11,6 +13,9 @@ const app = express();
 const PORT = 3001;
 
 app.use(express.json());
+
+
+
 app.listen(PORT, () =>{
     console.log(`Server is running at port:${PORT}`);
 });
@@ -187,10 +192,6 @@ app.post("/users/google", async(req, res) => {
             }
             if(isMatch){
                 const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
-          
-                // res.setHeader('Access-Control-Allow-Origin', '*');
-                // res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
-                // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         
                 res.status(200).json({
                     token,
@@ -200,9 +201,6 @@ app.post("/users/google", async(req, res) => {
                 });
 
             }else{
-                // res.setHeader('Access-Control-Allow-Origin', '*');
-                // res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
-                // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
                 res.status(400).json({
                     status: 400,
@@ -228,9 +226,6 @@ app.post("/users/google", async(req, res) => {
                             console.log(user)
                             const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
                
-                            // res.setHeader('Access-Control-Allow-Origin', '*');
-                            // res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
-                            // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
                            
                             res.status(200).json({
                                 token,
