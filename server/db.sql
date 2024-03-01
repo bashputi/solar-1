@@ -10,3 +10,5 @@ CREATE TABLE users (
     UNIQUE (email)
 );
 
+ALTER TABLE users
+ADD COLUMN role VARCHAR(50);

@@ -38,14 +38,15 @@ app.get('/', (req, res) => {
 // POST /register -> create a user
 app.post("/users/register", async(req, res) => {
     try {
-        let {firstname, lastname, username, email, password} = req.body;
+        let {firstname, lastname, username, email, role, password} = req.body;
         const id = uuidv4();
         console.log({
             firstname,
             lastname,
             username,
             email,
-            password
+            password,
+            role
         })
         let hashedPassword = await bcrypt.hash(password, 10);
         console.log(hashedPassword);
@@ -67,9 +68,9 @@ app.post("/users/register", async(req, res) => {
                       return;
                 }else{
                 pool.query(
-                    `INSERT INTO users (id, firstname, lastname, username, email, password )
-                    VALUES ($1, $2, $3, $4, $5, $6)
-                    returning *`, [id, firstname, lastname, username, email, hashedPassword],
+                    `INSERT INTO users (id, firstname, lastname, username, email, password, role )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    returning *`, [id, firstname, lastname, username, email, hashedPassword, "student"],
                     (err, results) => {
                         if (err){
                             throw err;
@@ -159,8 +160,8 @@ app.post("/users/login", async(req, res) => {
 //google login
 app.post("/users/google", async(req, res) => {
     try {
-        let { firstname, lastname, username, email, password } = req.body;
-        console.log({ firstname, lastname, username, email, password });
+        let { firstname, lastname, username, email, password, role } = req.body;
+        console.log({ firstname, lastname, username, email, password, role});
         const id = uuidv4();
         let hashedPassword = await bcrypt.hash(password, 10);
        
@@ -198,9 +199,9 @@ app.post("/users/google", async(req, res) => {
                     });
                 } else {
                     pool.query(
-                        `INSERT INTO users (id, firstname, lastname, username, email, password )
-                        VALUES ($1, $2, $3, $4, $5, $6)
-                        returning *`, [id, firstname, lastname, username, email, hashedPassword],
+                        `INSERT INTO users (id, firstname, lastname, username, email, password, role)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7)
+                        returning *`, [id, firstname, lastname, username, email, hashedPassword, "student"],
                         (err, results) => {
                             if (err) {
                                 console.log("Error inserting user", err);
