@@ -10,7 +10,7 @@ const { Client } = require('@vercel/postgres');
 
 const pool = require("./db");
 const app = express();
-const PORT = process.env.DB_PORT;
+const PORT = 3001;
 
 app.use(express.json());
 
@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
 // POST /register -> create a user
 app.post("/users/register", async(req, res) => {
     try {
-        let {firstname, lastname, username, email, role, password} = req.body;
+        let {firstname, lastname, username, email, password, role} = req.body;
         const id = uuidv4();
         console.log({
             firstname,
@@ -52,7 +52,7 @@ app.post("/users/register", async(req, res) => {
         console.log(hashedPassword);
 
         pool.query(
-            `SELECT * FROM users
+            `SELECT * FROM use
             WHERE email = $1`,
             [email],
             (err, results) => {
@@ -68,9 +68,9 @@ app.post("/users/register", async(req, res) => {
                       return;
                 }else{
                 pool.query(
-                    `INSERT INTO users (id, firstname, lastname, username, email, password, role )
+                    `INSERT INTO use (id, firstname, lastname, username, email, password, role )
                     VALUES ($1, $2, $3, $4, $5, $6, $7)
-                    returning *`, [id, firstname, lastname, username, email, hashedPassword, "student"],
+                    returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
                     (err, results) => {
                         if (err){
                             throw err;
@@ -102,7 +102,7 @@ app.post("/users/login", async(req, res) => {
             let {email, password} = req.body;
             console.log({email, password});
             pool.query(
-                `SELECT * FROM users
+                `SELECT * FROM use
                 WHERE email = $1`,
                 [email],
                 (err, results) => {
@@ -166,7 +166,7 @@ app.post("/users/google", async(req, res) => {
         let hashedPassword = await bcrypt.hash(password, 10);
        
         pool.query(
-            `SELECT * FROM users
+            `SELECT * FROM use
             WHERE email = $1`,
             [email],
             (err, results) => {
@@ -177,6 +177,7 @@ app.post("/users/google", async(req, res) => {
       
                 if (results && results.rows.length > 0) {
                     const user = results.rows[0];
+                    console.log(user)
                     bcrypt.compare(password, user.password, (err, isMatch) => {
                         if (err) {
                             console.log("Error comparing password", err);
@@ -199,9 +200,9 @@ app.post("/users/google", async(req, res) => {
                     });
                 } else {
                     pool.query(
-                        `INSERT INTO users (id, firstname, lastname, username, email, password, role)
+                        `INSERT INTO use (id, firstname, lastname, username, email, password, role)
                         VALUES ($1, $2, $3, $4, $5, $6, $7)
-                        returning *`, [id, firstname, lastname, username, email, hashedPassword, "student"],
+                        returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
                         (err, results) => {
                             if (err) {
                                 console.log("Error inserting user", err);
@@ -209,6 +210,7 @@ app.post("/users/google", async(req, res) => {
                             }
                             if (results.rows.length > 0) {
                                 const user = results.rows[0];
+                                console.log(user)
                                 const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
                                 return res.status(200).json({
                                     token,
