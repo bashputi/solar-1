@@ -14,8 +14,6 @@ const PORT = 3001;
 
 app.use(express.json());
 
-
-
 app.listen(PORT, () =>{
     console.log(`Server is running at port:${PORT}`);
 });
@@ -27,14 +25,7 @@ app.use(cors({
     ],
     Credential: true
 }));
-// const corsOptions = {
-//     origin: ['http://localhost:5173','https://versed-yard.surge.sh'],
-//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//     credentials: true,
-//     optionsSuccessStatus: 204,
-//   };
-  
-//   app.use(cors(corsOptions));
+
 
 
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
@@ -168,82 +159,71 @@ app.post("/users/login", async(req, res) => {
 //google login
 app.post("/users/google", async(req, res) => {
     try {
-        let {firstname, lastname, username, email, password} = req.body;
-        console.log({firstname, lastname, username, email, password})
+        let { firstname, lastname, username, email, password } = req.body;
+        console.log({ firstname, lastname, username, email, password });
         const id = uuidv4();
         let hashedPassword = await bcrypt.hash(password, 10);
        
-    pool.query(
-        `SELECT * FROM users
-        WHERE email = $1`,
-        [email],(err, results) => {
-            if(err){
-                console.log('server error')
-            }
-            console.log(results.rows);
-            if(results.rows.length > 0){
-
-            const user = results.rows[0];
-       
-         
-           bcrypt.compare(password, user.password, (err, isMatch) => {
-            if(err){
-                console.log("pass not compared", err);
-            }
-            if(isMatch){
-                const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
-        
-                res.status(200).json({
-                    token,
-                    status: 201,
-                    success: true,
-                    message: "Logged in Successfully",
-                });
-
-            }else{
-
-                res.status(400).json({
-                    status: 400,
-                    message: "Email already used!!",
-                  });
-                  return;
-            }
-            
-           })
-
-            }else{
-              
-                pool.query(
-                    `INSERT INTO users (id, firstname, lastname, username, email, password )
-                    VALUES ($1, $2, $3, $4, $5, $6)
-                    returning *`, [id, firstname, lastname, username, email, hashedPassword],
-                    (err, results) => {
-                        if (err){
-                            throw err;
+        pool.query(
+            `SELECT * FROM users
+            WHERE email = $1`,
+            [email],
+            (err, results) => {
+                if (err) {
+                    console.log('server error', err);
+                    return res.status(500).json({ error: 'Server error occurred' });
+                }
+      
+                if (results && results.rows.length > 0) {
+                    const user = results.rows[0];
+                    bcrypt.compare(password, user.password, (err, isMatch) => {
+                        if (err) {
+                            console.log("Error comparing password", err);
+                            return res.status(500).json({ error: 'Server error occurred' });
                         }
-                        if(results.rows.length > 0){
-                            const user = results.rows[0];
-                            console.log(user)
-                            const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
-               
-                           
-                            res.status(200).json({
+                        if (isMatch) {
+                            const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
+                            return res.status(200).json({
                                 token,
                                 status: 201,
                                 success: true,
-                                message: "User Created Successfully",
-                              });
+                                message: "Logged in Successfully",
+                            });
+                        } else {
+                            return res.status(400).json({
+                                status: 400,
+                                message: "Email already used!!",
+                            });
                         }
-  
-                    }
-                )
+                    });
+                } else {
+                    pool.query(
+                        `INSERT INTO users (id, firstname, lastname, username, email, password )
+                        VALUES ($1, $2, $3, $4, $5, $6)
+                        returning *`, [id, firstname, lastname, username, email, hashedPassword],
+                        (err, results) => {
+                            if (err) {
+                                console.log("Error inserting user", err);
+                                return res.status(500).json({ error: 'Server error occurred' });
+                            }
+                            if (results.rows.length > 0) {
+                                const user = results.rows[0];
+                                const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
+                                return res.status(200).json({
+                                    token,
+                                    status: 201,
+                                    success: true,
+                                    message: "User Created Successfully",
+                                });
+                            }
+                        }
+                    );
+                }
             }
-        }
-    )
-
-
+        );
     } catch (error) {
-        res.json({error: error.message});
+        console.log("Error occurred", error);
+        res.status(500).json({ error: 'Server error occurred' });
     }
 });
 
