@@ -16,30 +16,37 @@ import FacebookButton from "../../component/FacebookButton";
 const Register = () => {
   const navigate = useNavigate();
     const [password, setPassword] = useState('');
-    console.log(password)
+    const [recaptchaValue, setRecaptchaValue] = useState('');
+    
     const { register, handleSubmit,  formState: { errors }, } = useForm();
 
     const onSubmit = async(data) => {
-      console.log(data)
-      console.log(password)
+    
       if(password.length < 6){
           toast.error("Password must be at least 6 characters long", {
               position: "top-center",
               autoClose: 3000,
           });
-      } else {
+      } else if (!recaptchaValue) {
+        toast.error("Please complete the reCAPTCHA challenge", {
+            position: "top-center",
+            autoClose: 3000,
+        })
+       } else {
           if(data.confirmpassword === password){
               const Item = {
                   firstname: data.firstname,
                   lastname: data.lastname,
                   username: data.username,
                   email: data.email,
-                  password: data.confirmpassword
+                  password: data.confirmpassword,
+                  role: "student"
               }
   
               console.log(Item)
-              fetch('http://localhost:3001/users/register',{
+              fetch('https://vercel-solar.vercel.app/users/register',{
                   method: 'POST',
+              
                   headers: {
                       'content-type': 'application/json'
                   },
@@ -177,7 +184,11 @@ const Register = () => {
                 
                     </div>
             </div>
-            <ReCAPTCHA sitekey="6Lfo8IIpAAAAAImpxGwB5apeC3mAPGyhUfkLmi86"/>
+            <ReCAPTCHA sitekey="6Lfo8IIpAAAAAImpxGwB5apeC3mAPGyhUfkLmi86"
+                            onChange={(value) => {
+                              setRecaptchaValue(value);
+                            }}
+                        />
         <div>
           <button className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Register

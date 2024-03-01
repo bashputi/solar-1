@@ -5,10 +5,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import GoogleLoginButton from "../../component/GoogleLoginButton";
 import FacebookButton from "../../component/FacebookButton";
+import { useState } from "react";
 
 
 const Login = () => {
   const navigate = useNavigate();
+  const [recaptchaValue, setRecaptchaValue] = useState('');
+
     const handleLogin = async(e) => {
         e.preventDefault();
     const form = e.target;
@@ -16,10 +19,18 @@ const Login = () => {
         email: form.email.value,
         password: form.password.value
     };
-    await fetch("http://localhost:3001/users/login", {
+     if (!recaptchaValue) {
+      toast.error("Please complete the reCAPTCHA challenge", {
+          position: "top-center",
+          autoClose: 3000,
+      })
+     }else{
+      await fetch("https://vercel-solar.vercel.app/users/login", {
         method: "POST",
+      
         headers: {
           "content-type": "application/json",
+          
         },
         body: JSON.stringify(Item),
       })
@@ -29,7 +40,7 @@ const Login = () => {
           if (data.success) {
           
             const Token = data.token;
-            localStorage.setItem('token', Token);
+            localStorage.setItem('token', Token.toString());
 
             
             toast.success(data.message, {
@@ -53,6 +64,9 @@ const Login = () => {
          
           }
         });
+     }
+
+   
     };
   
    
@@ -110,7 +124,10 @@ const Login = () => {
                   />
                 </div>
                <div className="mt-6">
-               <ReCAPTCHA sitekey="6Lfo8IIpAAAAAImpxGwB5apeC3mAPGyhUfkLmi86"/>
+               <ReCAPTCHA sitekey="6Lfo8IIpAAAAAImpxGwB5apeC3mAPGyhUfkLmi86"
+                onChange={(value) => {
+                  setRecaptchaValue(value);
+                }}/>
                </div>
               </div>
               {/* <div className="flex items-center justify-between">

@@ -8,8 +8,9 @@ const GoogleLoginButton = () => {
   const navigate = useNavigate();
   const sendUserDataToBackend = (userData) => {
    console.log(userData)
-      fetch('http://localhost:3001/users/google', {
+      fetch('https://vercel-solar.vercel.app/users/google', {
           method: 'POST',
+         
           headers: {
               'Content-Type': 'application/json',
           },
@@ -19,7 +20,7 @@ const GoogleLoginButton = () => {
       .then(data => {
           if(data.success){
               const Token = data.token;
-              localStorage.setItem('token', Token);
+              localStorage.setItem('token', Token.toString());
               toast.success(data.message, {
                 position: "top-right",
                 autoClose: 3000,
@@ -59,6 +60,7 @@ const GoogleLoginButton = () => {
                     username: name,
                     email: email,
                     password: given_name,
+                    role: "student"
                 };
                 sendUserDataToBackend(userData);
 

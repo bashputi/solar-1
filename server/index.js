@@ -52,7 +52,7 @@ app.post("/users/register", async(req, res) => {
         console.log(hashedPassword);
 
         pool.query(
-            `SELECT * FROM use
+            `SELECT * FROM users
             WHERE email = $1`,
             [email],
             (err, results) => {
@@ -68,7 +68,7 @@ app.post("/users/register", async(req, res) => {
                       return;
                 }else{
                 pool.query(
-                    `INSERT INTO use (id, firstname, lastname, username, email, password, role )
+                    `INSERT INTO users (id, firstname, lastname, username, email, password, role )
                     VALUES ($1, $2, $3, $4, $5, $6, $7)
                     returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
                     (err, results) => {
@@ -102,7 +102,7 @@ app.post("/users/login", async(req, res) => {
             let {email, password} = req.body;
             console.log({email, password});
             pool.query(
-                `SELECT * FROM use
+                `SELECT * FROM users
                 WHERE email = $1`,
                 [email],
                 (err, results) => {
@@ -166,7 +166,7 @@ app.post("/users/google", async(req, res) => {
         let hashedPassword = await bcrypt.hash(password, 10);
        
         pool.query(
-            `SELECT * FROM use
+            `SELECT * FROM users
             WHERE email = $1`,
             [email],
             (err, results) => {
@@ -200,7 +200,7 @@ app.post("/users/google", async(req, res) => {
                     });
                 } else {
                     pool.query(
-                        `INSERT INTO use (id, firstname, lastname, username, email, password, role)
+                        `INSERT INTO users (id, firstname, lastname, username, email, password, role)
                         VALUES ($1, $2, $3, $4, $5, $6, $7)
                         returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
                         (err, results) => {

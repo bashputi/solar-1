@@ -1,0 +1,28 @@
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
+
+const useAuth = () => {
+    const [data, setData] = useState('');
+    console.log(data)
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const credentialResponseDecoded = jwtDecode(token);
+            if (credentialResponseDecoded) {
+                setData(credentialResponseDecoded);
+            } else {
+             
+                setData(null); 
+            }
+        } else {
+           
+            setData(null); 
+        }
+    }, []);
+
+
+return [data]
+};
+
+export default useAuth;

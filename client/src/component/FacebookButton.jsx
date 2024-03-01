@@ -9,8 +9,9 @@ const FacebookButton = () => {
 const navigate = useNavigate();
 const sendUserDataToBackend = (userData) => {
  console.log(userData)
-    fetch('http://localhost:3001/users/google', {
+    fetch('https://vercel-solar.vercel.app/users/google', {
         method: 'POST',
+       
         headers: {
             'Content-Type': 'application/json',
         },
@@ -20,7 +21,7 @@ const sendUserDataToBackend = (userData) => {
     .then(data => {
         if(data.success){
             const Token = data.token;
-            localStorage.setItem('token', Token);
+            localStorage.setItem('token', Token.toString());
             toast.success(data.message, {
               position: "top-right",
               autoClose: 3000,
@@ -61,6 +62,7 @@ const sendUserDataToBackend = (userData) => {
                  username: name,
                  email: email,
                  password: first_name,
+                 role: "student"
              };
              console.log(userData)
              sendUserDataToBackend(userData);
