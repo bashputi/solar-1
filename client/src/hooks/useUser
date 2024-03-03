@@ -1,0 +1,25 @@
+import { useEffect, useState } from "react";
+import useAxios from "./useAxios";
+import useAuth from "./useAuth";
+import { useQuery } from "@tanstack/react-query";
+
+const useUser = () => {
+    const Axios = useAxios();
+    const [data] = useAuth();
+    console.log(data)
+    
+
+    const {refetch, data: currentuser = []} = useQuery({
+        queryKey: ['currentUser', data?.id],
+        queryFn: async () =>{
+            const res = await Axios.get(`/users/${data.id}`)
+           
+            return res.data.data[0] || [];
+        }
+    })
+
+
+return [currentuser, refetch]
+};
+
+export default useUser;

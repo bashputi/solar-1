@@ -1,3 +1,3 @@
 # React + Vite
 
-- shiny-cook.surge.sh
+- versed-yard.surge.sh

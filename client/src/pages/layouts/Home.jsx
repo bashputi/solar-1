@@ -1,4 +1,4 @@
-
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import useAuth from "../../hooks/useAuth";
@@ -7,18 +7,23 @@ import useAuth from "../../hooks/useAuth";
 
 
 const Home = () => {
+    const navigate = useNavigate();
    const [data] = useAuth();
    console.log(data)
     
 
-const handleLogOut = (data) => {
-console.log(data)
-if(data.type === "click"){
-    localStorage.removeItem('token');
-    location.reload();
-    
-}
-}
+   const handleLogOut = async() => {
+    await fetch("http://localhost:3001/users/logout", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"},
+    })
+      .then((res) => res.json())
+      .then((data) =>{
+        if (data.success) {
+          navigate('/login')
+       return localStorage.removeItem('token');
+        }}) };
 
     return (
  <div>

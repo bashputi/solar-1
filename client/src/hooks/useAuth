@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 const useAuth = () => {
     const [data, setData] = useState('');
-    console.log(data)
 
     useEffect(() => {
         const token = localStorage.getItem('token');

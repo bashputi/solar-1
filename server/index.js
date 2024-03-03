@@ -157,7 +157,7 @@ app.post("/users/login", async(req, res) => {
         }
     });
 
-//google login
+// POST /google login
 app.post("/users/google", async(req, res) => {
     try {
         let { firstname, lastname, username, email, password, role } = req.body;
@@ -225,12 +225,42 @@ app.post("/users/google", async(req, res) => {
             }
         );
     } catch (error) {
-        console.log("Error occurred", error);
         res.status(500).json({ error: 'Server error occurred' });
     }
 });
 
+// POST logout 
+app.post("/users/logout", (req, res) => {
+   try {
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Logout Successfully",
+    });
+   } catch (error) {
+    res.status(500).json({ error: 'Server error occurred' });
+   }
+});
 
+//GET /users
+app.get('/users', async(req, res) => {
+    try {
+        const users = await pool.query("SELECT * FROM users;")
+        res.status(200).json({message: "users are returned", data: users.rows});
+    } catch (error) {
+        res.json({error: error.message}); 
+    }
+});
 
+//GET /users/:id
+app.get("/users/:id", async(req, res) => {
+try {
+    const { id } = req.params;
+    const users = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    res.status(200).json({message: "Specific user is returned", data: users.rows });
+} catch (error) {
+    res.json({error: error.message});
+}
+});
   
  

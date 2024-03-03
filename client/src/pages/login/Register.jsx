@@ -44,7 +44,7 @@ const Register = () => {
               }
   
               console.log(Item)
-              fetch('https://vercel-solar.vercel.app/users/register',{
+              fetch('http://localhost:3001/users/register',{
                   method: 'POST',
               
                   headers: {
