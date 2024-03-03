@@ -22,7 +22,7 @@ import { Outlet } from "react-router-dom";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [data] = useAuth();
-  console.log(data)
+
   
   const handleLogOut = async() => {
     await fetch("http://localhost:3001/users/logout", {
@@ -59,19 +59,19 @@ const Dashboard = () => {
 
       <Link to="/dashboard/myprofile" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <CgProfile className="mr-2" />  My Profile </Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <FaGraduationCap  className="mr-2" />  Enrolled Courses</Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <BsBookmarkFill className="mr-2" />  Wishlist </Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link  className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <FaStar className="mr-2" />  Reviews </Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <MdQuiz className="mr-2" />  Quiz Attemps</Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <FaShoppingCart  className="mr-2" />  Order History </Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <FaFileCircleQuestion className="mr-2" /> Question & Answer</Link>
-      <Link to="/dashboard/studentdashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <SlCalender className="mr-2" />  Calender </Link>
 
 
@@ -145,7 +145,7 @@ const Dashboard = () => {
         <IoHomeSharp className="mr-2"/>Home</Link>
         <button onClick={handleLogOut} className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
         <IoLogOut className="mr-2"/>LogOut</button>
-        <Link className="flex items-center px-5 py-2 mb-5 text-gray-100 hover:bg-gray-700">
+        <Link to="/dashboard/settings" className="flex items-center px-5 py-2 mb-5 text-gray-100 hover:bg-gray-700">
          <IoSettingsSharp className="mr-2"/> Settings
         </Link>
     </div>

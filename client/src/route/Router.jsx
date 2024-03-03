@@ -10,6 +10,12 @@ import Students from "../component/AdminDashboard/Students";
 import Instructors from "../component/AdminDashboard/Instructors";
 import MyProfile from "../component/StudentDashboard/MyProfile";
 import StudentDashboard from "../component/StudentDashboard/StudentDashboard";
+import NotFound from "../pages/NotFound";
+import Settings from "../pages/layouts/dashboard/Settings";
+import Profile from "../component/settings/Profile";
+import Password from "../component/settings/Password";
+import SocialProfile from "../component/settings/SocialProfile";
+import ManageLogin from "../component/settings/ManageLogin";
 
 
 
@@ -17,6 +23,7 @@ const myRouter = createBrowserRouter([
 {
     path: '/',
     element: <MainLayOut></MainLayOut>,
+    errorElement: <NotFound></NotFound>,
     children: [
         {
             path: '/',
@@ -60,9 +67,32 @@ const myRouter = createBrowserRouter([
             path: 'studentdashboard',
             element: <StudentDashboard />
         },
-
+        {
+            path: '/dashboard/settings',
+            element: <Settings />,
+            children: [
+                {
+                    path: 'profile',
+                    element: <Profile />
+                },
+                {
+                    path: 'password',
+                    element: <Password />
+                },
+                {
+                    path: 'socialprofile',
+                    element: <SocialProfile />
+                },
+                {
+                    path: 'managelogin',
+                    element: <ManageLogin />
+                },
+            ]
+        }
     ]
-}
+},
+
+
 ]);
 
 export default myRouter;
