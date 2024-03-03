@@ -6,14 +6,12 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
 const { Client } = require('@vercel/postgres');
-
-
+const secretKey = process.env.ACCESS_TOKEN_SECRET;
 const pool = require("./db");
 const app = express();
 const PORT = 3001;
 
 app.use(express.json());
-
 app.listen(PORT, () =>{
     console.log(`Server is running at port:${PORT}`);
 });
@@ -25,11 +23,6 @@ app.use(cors({
     ],
     Credential: true
 }));
-
-
-
-const secretKey = process.env.ACCESS_TOKEN_SECRET;
-
 
 app.get('/', (req, res) => {
     res.send("hello");
@@ -94,7 +87,7 @@ app.post("/users/register", async(req, res) => {
     } catch (error) {
         res.json({error: error.message});
     }
-    });
+});
 
 // POST /login 
 app.post("/users/login", async(req, res) => {
@@ -155,7 +148,7 @@ app.post("/users/login", async(req, res) => {
         } catch (error) {
             res.json({error: error.message});
         }
-    });
+});
 
 // POST /google login
 app.post("/users/google", async(req, res) => {
@@ -263,4 +256,82 @@ try {
 }
 });
   
- 
+// PATCH /users/bio/:id
+app.patch('/users/bio/:id', async(req, res) => {
+try {
+   
+    let { firstname, lastname, skill, phn, bio } = req.body;
+    const { id } = req.params;
+    const addColumnsQuery = `
+    DO $$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'skill') THEN
+            ALTER TABLE users ADD COLUMN skill TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'phn') THEN
+            ALTER TABLE users ADD COLUMN phn TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'bio') THEN
+            ALTER TABLE users ADD COLUMN bio TEXT;
+        END IF;
+    END
+    $$;
+`;
+
+await pool.query(addColumnsQuery);
+const updateQuery = {
+    text: `UPDATE users 
+           SET firstname = $1, lastname = $2, 
+               skill = COALESCE($3, skill), 
+               phn = COALESCE($4, phn), 
+               bio = COALESCE($5, bio)
+           WHERE id = $6
+           RETURNING *`,
+    values: [firstname, lastname, skill, phn, bio, id],
+};
+const result = await pool.query(updateQuery);
+if (result.rowCount === 0) {
+    return res.status(404).json({ error: "User not found" });
+}
+res.json(result.rows[0]);
+} catch (error) {
+    res.json({error: error.message});
+}
+});
+
+//PATCH /users/profile
+app.patch('/users/profile', async(req, res) => {
+try {
+    const {profileimage, email, coverimage} = req.body;
+    console.log({profileimage, email, coverimage})
+    const addColumnsQuery = `
+    DO $$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'profileimage') THEN
+            ALTER TABLE users ADD COLUMN profileimage TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'coverimage') THEN
+            ALTER TABLE users ADD COLUMN coverimage TEXT;
+        END IF;
+    END
+    $$;
+`;
+await pool.query(addColumnsQuery);
+const updateQuery = {
+    text: `UPDATE users 
+           SET profileimage = COALESCE($1, profileimage),
+           coverimage = COALESCE($2, coverimage)
+           WHERE email = $3
+           RETURNING *`,
+    values: [profileimage, coverimage, email],
+};
+const result = await pool.query(updateQuery);
+if (result.rowCount === 0) {
+    return res.status(404).json({ error: "Update faild" });
+}
+res.json(result.rows[0]);
+
+} catch (error) {
+    res.json({error: error.message});
+}
+});

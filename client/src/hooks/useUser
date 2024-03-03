@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 const useUser = () => {
     const Axios = useAxios();
     const [data] = useAuth();
-    console.log(data)
     
 
     const {refetch, data: currentuser = []} = useQuery({

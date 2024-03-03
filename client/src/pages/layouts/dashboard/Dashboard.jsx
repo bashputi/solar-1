@@ -145,7 +145,7 @@ const Dashboard = () => {
         <IoHomeSharp className="mr-2"/>Home</Link>
         <button onClick={handleLogOut} className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
         <IoLogOut className="mr-2"/>LogOut</button>
-        <Link to="/dashboard/settings" className="flex items-center px-5 py-2 mb-5 text-gray-100 hover:bg-gray-700">
+        <Link to="/dashboard/settings/profile" className="flex items-center px-5 py-2 mb-5 text-gray-100 hover:bg-gray-700">
          <IoSettingsSharp className="mr-2"/> Settings
         </Link>
     </div>
