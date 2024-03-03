@@ -9,15 +9,15 @@ const Settings = () => {
             <div className="mt-8">
             <nav className="z-10">
             <ul className="flex flex-row items-center py-4 rounded-lg">
-                <li className="pr-8 ">
+                <li className="pr-16 ">
                 <Link to="profile">Profile</Link>
                 </li>
-                <li className="pr-8">
+                <li className="pr-16">
                 <Link to="password" >
                     Password
                 </Link>
                 </li>
-                <li className="pr-8">
+                <li className="pr-16">
                 <Link to='socialprofile'>
                     Social Profile
                 </Link>
@@ -29,7 +29,7 @@ const Settings = () => {
                 </li>
             </ul>
             </nav>
-                <hr className="w-[70vw] h-0.5 bg-gray-300"/>
+                <hr className="w-[60vw] h-0.5 bg-gray-300"/>
             </div>
             <div className="mt-8">
                 <Outlet></Outlet>
