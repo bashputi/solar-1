@@ -332,6 +332,51 @@ if (result.rowCount === 0) {
 res.json(result.rows[0]);
 
 } catch (error) {
-    res.json({error: error.message});
+    res.status(500).json({ error: 'Internal server error' });
 }
+});
+
+//DELETE /coverphoto/:id 
+app.delete('/users/coverphoto/:id', async(req, res) => {
+    try {
+        const { id } = req.params;
+    const deleteQuery = 'UPDATE users SET coverimage = NULL WHERE id = $1';
+    await pool.query(deleteQuery, [id]);
+
+    res.status(200).json({ message: 'Cover photo deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST //users/password/:id
+app.post('/users/password/:id', async (req, res) => {
+    try {
+        const { password, newpassword } = req.body;
+        const { id } = req.params;
+        console.log(id)
+        console.log({ password, newpassword })
+        const results = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+        const user = results.rows[0];
+
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log(isMatch)
+
+        if (!isMatch) {
+            res.status(201).json({ message: 'Current password is incorrect' });
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(newpassword, 10);
+console.log(hashedPassword)
+        await pool.query(`UPDATE users SET password = $1 WHERE id = $2`, [hashedPassword, id]);
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error updating password:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });

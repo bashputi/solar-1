@@ -19,6 +19,7 @@ const Profile = () => {
     const Axios = useAxios();
     const fileInputRef = useRef(null);
     const fileRef = useRef(null);
+   
 
 
     const onSubmit = (data) => {
@@ -69,6 +70,8 @@ const Profile = () => {
                 }
                 const profileRes = await Axios.patch(`/users/profile`, profileImage); 
                 if (profileRes.data) {
+                    console.log(profileRes.data.profileimage)
+                  
                     toast.success('Profile Image Updated Successfully!!', {
                         position: "top-right",
                         autoClose: 3000,
@@ -118,6 +121,23 @@ const Profile = () => {
         }
     };
 
+    const handleDelete = (id) => {
+        Axios.delete(`/users/coverphoto/${id}`)
+        .then(res => {
+            if (res.status === 200) {
+                toast.success(res.data.message, {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    onClose: () => location.reload()
+                  });
+            }
+        })
+    };
+
     return (
         <div className="w-[40vw]">
     {/* profile and cover photo section  */}
@@ -147,10 +167,10 @@ const Profile = () => {
                 style={{ display: 'none' }}
                 onChange={handleCoverImage}
             />
-       <button onClick={handleClick} className="px-4  border border-transparent text-sm font-medium rounded-md text-white hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 py-2 flex bg-amber-600 "><FaCamera className="block mt-0.5 mr-2"/>  Update Cover photo</button>
+       <button onClick={handleClick} className="px-4  border border-transparent text-sm font-medium rounded-md text-white hover:bg-amber-500 py-2 flex bg-amber-600 "><FaCamera className="block mt-0.5 mr-2"/>  Update Cover photo</button>
         </div> 
         <div className="relative ml-72 -top-48 left-96 rounded-xl ">
-       <button className="w-12 h-12 rounded-full flex justify-center items-center border border-transparent text-sm font-bold text-white bg-gray-500 hover:bg-gray-600 bg-opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  "><RiDeleteBin6Fill className="w-5 h-5"/></button>
+       <button onClick={() => handleDelete(currentUser?.id)} className="w-12 h-12 rounded-full flex justify-center items-center border border-transparent text-sm font-bold text-white bg-gray-500 hover:bg-gray-600 bg-opacity-50 "><RiDeleteBin6Fill className="w-5 h-5"/></button>
         </div> 
       </div> </div>
     {/* From data section  */}

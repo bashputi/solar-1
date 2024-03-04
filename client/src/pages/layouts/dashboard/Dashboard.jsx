@@ -17,11 +17,13 @@ import { BiSolidCategoryAlt, BiSolidMessageAltEdit  } from "react-icons/bi";
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
+import useUser from "../../../hooks/useUser";
 
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [data] = useAuth();
+  const [currentUser] = useUser();
+ 
 
   
   const handleLogOut = async() => {
@@ -41,16 +43,23 @@ const Dashboard = () => {
         <div className="flex h-screen bg-gray-100">
   {/* sidebar */}
   <div className="hidden md:flex flex-col w-64 bg-gray-800">
-    <div className="flex text-2xl items-center gap-1 justify-center h-28 bg-gray-900">
+    
+    <div className=" py-3 bg-gray-900">
+    <div className="flex justify-center">
+      <img className="w-32 h-32 rounded-full" src={currentUser?.profileimage || 'https://i.ibb.co/G7b1pnb/blank-avatar-photo-place-holder-600nw-1095249842.webp'} alt="profile image" />
+    </div>
+      
+      <div className="flex justify-center">
       <h1 className=" text-white font-semibold">Hello, </h1>
-      <h1 className=" text-white font-semibold">{data?.username}</h1>
+      <h1 className=" text-white font-semibold">{currentUser?.username}</h1>
+      </div>
     </div>
     <div className="flex flex-col flex-1 overflow-y-auto"> 
      <nav className="flex-1 px-2 py-4 bg-gray-800">
 
     {/* Studebt Dashboard  */}
       {
-        // data?.role === 'student' && 
+        currentUser?.role === 'student' && 
         <>
         <h1 className="text-lg font-semibold text-red-600">Student Dashboard</h1>
 
@@ -81,7 +90,7 @@ const Dashboard = () => {
 {/* 
    Instructor DAshboar     */}
       {
-        data.role === 'instructor' && <>
+        currentUser.role === 'instructor' && <>
         <h1 className="text-lg font-semibold text-green-600">Instructor Dashboard</h1>
         <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <FaBars className="mr-2"/> Dashboard</Link>
@@ -109,7 +118,7 @@ const Dashboard = () => {
 
   {/* Admin Dashboard  */}
       {
-        data.role === 'admin' && <>
+        currentUser.role === 'admin' && <>
         <h1 className="text-lg font-semibold text-amber-600">Admin Dashboard</h1>
         
         <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >

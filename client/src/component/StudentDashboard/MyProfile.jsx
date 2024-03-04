@@ -1,15 +1,10 @@
-import useAxios from "../../hooks/useAxios";
 import useUser from "../../hooks/useUser";
 
 
-
 const MyProfile = () => {
-    const Axios = useAxios();
-   
     const [currentuser] = useUser();
     console.log(currentuser)
     
-   
 
     return (
         <div className="mt-8 ml-8">
@@ -31,7 +26,7 @@ const MyProfile = () => {
                     <p className="my-4">{currentuser?.email || '-'}</p>
                     <p>{currentuser?.phn || '-'}</p>
                     <p className="my-4">{currentuser?.skill || '-'}</p>
-                    <p>{currentuser?.bio || '-'}</p>
+                    <div dangerouslySetInnerHTML={{ __html: currentuser?.bio } }></div>
                     
                  
                 </div>

@@ -11,17 +11,13 @@ import GoogleLoginButton from "../../component/GoogleLoginButton";
 import FacebookButton from "../../component/FacebookButton";
 
 
-
-
 const Register = () => {
   const navigate = useNavigate();
     const [password, setPassword] = useState('');
     const [recaptchaValue, setRecaptchaValue] = useState('');
-    
     const { register, handleSubmit,  formState: { errors }, } = useForm();
 
     const onSubmit = async(data) => {
-    
       if(password.length < 6){
           toast.error("Password must be at least 6 characters long", {
               position: "top-center",
@@ -42,11 +38,8 @@ const Register = () => {
                   password: data.confirmpassword,
                   role: "student"
               }
-  
-              console.log(Item)
               fetch('http://localhost:3001/users/register',{
                   method: 'POST',
-              
                   headers: {
                       'content-type': 'application/json'
                   },
