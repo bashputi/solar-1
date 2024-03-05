@@ -16,6 +16,9 @@ import Profile from "../component/settings/Profile";
 import Password from "../component/settings/Password";
 import SocialProfile from "../component/settings/SocialProfile";
 import ManageLogin from "../component/settings/ManageLogin";
+import DashboardHome from "../pages/layouts/dashboard/DashboardHome";
+import InstructorDashboard from "../component/InstructorDashboard/InstructorDashboard";
+import Apply from "../component/StudentDashboard/Apply";
 
 
 
@@ -36,13 +39,21 @@ const myRouter = createBrowserRouter([
         {
             path: '/login',
             element: <Login></Login>
-        }
+        },
+        {
+            path: 'apply',
+            element: <Apply />
+        },
     ]
 },
 {
     path: '/dashboard',
     element: <Dashboard></Dashboard>,
     children: [
+        {
+            path: '/dashboard',
+            element: <DashboardHome /> 
+        },
         {
             path: 'admindashboard',
             element: <AdminDashboard />
@@ -66,6 +77,10 @@ const myRouter = createBrowserRouter([
         {
             path: 'studentdashboard',
             element: <StudentDashboard />
+        },
+        {
+            path: 'instructor',
+            element: <InstructorDashboard />
         },
         {
             path: '/dashboard/settings',

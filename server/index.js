@@ -255,6 +255,26 @@ try {
     res.json({error: error.message});
 }
 });
+
+// GET /students for usestudents hook
+app.get('/students', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE role = $1', ['student']);
+      res.json({ message: 'Students are returned', data: result.rows });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+// GET /instructors for usestudents hook
+app.get('/instructors', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE request IS NOT NULL;');
+      res.json({ message: 'Instructors are returned', data: result.rows });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
   
 // PATCH /users/bio/:id
 app.patch('/users/bio/:id', async(req, res) => {
@@ -354,8 +374,7 @@ app.post('/users/password/:id', async (req, res) => {
     try {
         const { password, newpassword } = req.body;
         const { id } = req.params;
-        console.log(id)
-        console.log({ password, newpassword })
+
         const results = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
         const user = results.rows[0];
 
@@ -371,12 +390,68 @@ app.post('/users/password/:id', async (req, res) => {
             return;
         }
         const hashedPassword = await bcrypt.hash(newpassword, 10);
-console.log(hashedPassword)
         await pool.query(`UPDATE users SET password = $1 WHERE id = $2`, [hashedPassword, id]);
 
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error updating password:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST /users/request/:id
+app.patch('/users/request/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {request} = req.body
+        console.log(id, request);
+        const results = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+        const user = results.rows[0];
+
+        const addColumnsQuery = `
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'request') THEN
+                ALTER TABLE users ADD COLUMN request TEXT;
+            END IF;
+        END
+        $$;
+        `;
+        await pool.query(addColumnsQuery);
+        const updateQuery = {
+        text: `UPDATE users 
+            SET request = COALESCE($1, request)
+            WHERE id = $2
+            RETURNING *`,
+        values: [request, id],
+        };
+        const result = await pool.query(updateQuery);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Update faild" });
+        }
+        res.json(result.rows[0]);
+
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' }); 
+    }
+})
+
+app.patch('/index/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const results = await pool.query('UPDATE users SET request = $1 WHERE id = $2 RETURNING *', [status, id]);
+        if (results.rows.length === 0) {
+            // No user found with the provided ID
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = results.rows[0];
+        console.log(user);
+        res.status(200).json({ message: 'Status updated successfully', user });
+    } catch (error) {
+        console.error('Error updating status:', error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

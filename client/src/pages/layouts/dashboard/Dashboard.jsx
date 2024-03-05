@@ -1,6 +1,5 @@
 import { CgProfile } from "react-icons/cg";
 import { FaBars } from "react-icons/fa";
-import useAuth from "../../../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { FaGraduationCap, FaFileCircleQuestion, FaClipboardQuestion } from "react-icons/fa6";
 import { BsBookmarkFill } from "react-icons/bs";
@@ -14,17 +13,21 @@ import { PiCertificateFill, PiStudentFill } from "react-icons/pi";
 import { MdLibraryBooks, MdFeedback, MdQuiz, MdGrade } from "react-icons/md";
 import { HiRectangleStack } from "react-icons/hi2";
 import { BiSolidCategoryAlt, BiSolidMessageAltEdit  } from "react-icons/bi";
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import useUser from "../../../hooks/useUser";
+import useAxios from "../../../hooks/useAxios";
+import  { useState, useEffect } from 'react';
 
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [currentUser] = useUser();
- 
+  const [currentUser, refetch] = useUser();
+  const Axios = useAxios();
+  const [requestSent, setRequestSent] = useState(false);
+  console.log(requestSent, currentUser.request)
 
+  // const history = useHistory();
   
   const handleLogOut = async() => {
     await fetch("http://localhost:3001/users/logout", {
@@ -39,16 +42,37 @@ const Dashboard = () => {
        return localStorage.removeItem('token');
         }}) };
 
+        useEffect(() => {
+        if(currentUser.request === 'pending'){
+          setRequestSent(true)
+        }
+        }, [currentUser]);
+      
+        const handleRequest = (id) => {
+          const Item = { request: 'pending' };
+          Axios.patch(`/users/request/${id}`, Item)
+            .then(res => {
+              if (res.status === 200) {
+              // setRequestSent(true)
+                setTimeout(() => {
+                  navigate('/apply');
+                }, 2000); 
+                refetch();
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+        }
+
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-200">
   {/* sidebar */}
   <div className="hidden md:flex flex-col w-64 bg-gray-800">
-    
     <div className=" py-3 bg-gray-900">
     <div className="flex justify-center">
       <img className="w-32 h-32 rounded-full" src={currentUser?.profileimage || 'https://i.ibb.co/G7b1pnb/blank-avatar-photo-place-holder-600nw-1095249842.webp'} alt="profile image" />
     </div>
-      
       <div className="flex justify-center">
       <h1 className=" text-white font-semibold">Hello, </h1>
       <h1 className=" text-white font-semibold">{currentUser?.username}</h1>
@@ -56,7 +80,6 @@ const Dashboard = () => {
     </div>
     <div className="flex flex-col flex-1 overflow-y-auto"> 
      <nav className="flex-1 px-2 py-4 bg-gray-800">
-
     {/* Studebt Dashboard  */}
       {
         currentUser?.role === 'student' && 
@@ -87,14 +110,14 @@ const Dashboard = () => {
 
         </>
       }
-{/* 
-   Instructor DAshboar     */}
+{/* Instructor DAshboar     */}
       {
-        currentUser.role === 'instructor' && <>
+        currentUser.role === 'instructor' && 
+        <>
         <h1 className="text-lg font-semibold text-green-600">Instructor Dashboard</h1>
-        <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
+        <Link to="/dashboard/instructor" className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <FaBars className="mr-2"/> Dashboard</Link>
-        <Link className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
+        <Link to="/dashboard/myprofile" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
         <CgProfile className="mr-2" />My Profile</Link>
         <Link className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
         <PiMicrophoneStageFill className="mr-2" />Announcements</Link>
@@ -112,8 +135,6 @@ const Dashboard = () => {
         <FaChartPie className="mr-2" />Analytics</Link>
        
         </>
-       
-        
       }
 
   {/* Admin Dashboard  */}
@@ -125,9 +146,9 @@ const Dashboard = () => {
         <FaBars className="mr-2"/> Dashboard</Link>
         <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <MdLibraryBooks className="mr-2"/> Courses</Link>
-        <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
+        <Link to="/dashboard/instructors" className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <FaChalkboardTeacher className="mr-2"/> Instructors</Link>
-        <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
+        <Link to='/dashboard/students' className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <PiStudentFill className="mr-2"/> Students</Link>
         <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <HiRectangleStack className="mr-2"/> Enrollement</Link>
@@ -149,7 +170,7 @@ const Dashboard = () => {
       } 
        
       </nav>
-<hr className="h-0.5 mb-2 bg-white mx-4"/>
+        <hr className="h-0.5 mb-2 bg-white mx-4"/>
         <Link to="/" className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
         <IoHomeSharp className="mr-2"/>Home</Link>
         <button onClick={handleLogOut} className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
@@ -159,20 +180,39 @@ const Dashboard = () => {
         </Link>
     </div>
   </div>
-  {/* Main content */}
+{/* white part of main content */}
   <div className="flex flex-col flex-1 overflow-y-auto">
-    <div className="flex items-center justify-between h-16 bg-white border-b border-gray-200">
+    <div className="flex items-center justify-end h-20 bg-white border-b border-gray-200">
+    <div className="mr-12"> 
+    {
+    currentUser.role === 'student' && 
+        <>
+          {requestSent ? (
+            <p>Your request has been sent. Please wait for response.</p>
+          ) : (
+            <button onClick={() => handleRequest(currentUser.id)} className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold leading-6 capitalize duration-100 transform border-2 rounded-sm cursor-pointer border-amber-300 focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 focus:outline-none sm:w-auto sm:px-6 border-text  hover:shadow-lg hover:-translate-y-1">
+              Become an Instructor
+            </button>
+          )}
+        </>
+      }
+       {
+        currentUser.role === 'instructor' && 
+        <>
+          <Link ><button  className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold leading-6 capitalize duration-100 transform border-2 rounded-sm cursor-pointer border-amber-300 focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 focus:outline-none sm:w-auto sm:px-6 border-text  hover:shadow-lg hover:-translate-y-1">
+          Create New Course</button> </Link>
+        </>
+       }
      
     </div>
-    <div className="p-4">
-     
-    <Outlet></Outlet>
-      
 
+    </div>
+      {/* Main content */}
+    <div className="p-4">
+    <Outlet></Outlet>
     </div>
   </div>
 </div>
-
     );
 };
 

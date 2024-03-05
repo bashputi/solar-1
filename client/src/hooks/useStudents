@@ -1,0 +1,21 @@
+import useAxios from "./useAxios";
+import useUser from "./useUser";
+import { useQuery } from "@tanstack/react-query";
+
+
+const useStudents = () => {
+    const Axios = useAxios();
+  
+    const {refetch, data: students = []} = useQuery({
+        queryKey: ['students'],
+        queryFn: async () =>{
+            const res = await Axios.get('/students')
+            return res.data.data || [];
+        }
+    })
+
+
+return [students, refetch]
+};
+
+export default useStudents;
