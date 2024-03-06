@@ -112,7 +112,7 @@ const Dashboard = () => {
       }
 {/* Instructor DAshboar     */}
       {
-        currentUser.role === 'instructor' && 
+        currentUser.request === 'Approved' && 
         <>
         <h1 className="text-lg font-semibold text-green-600">Instructor Dashboard</h1>
         <Link to="/dashboard/instructor" className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
@@ -144,7 +144,7 @@ const Dashboard = () => {
         
         <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <FaBars className="mr-2"/> Dashboard</Link>
-        <Link className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
+        <Link to="/dashboard/courses" className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <MdLibraryBooks className="mr-2"/> Courses</Link>
         <Link to="/dashboard/instructors" className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <FaChalkboardTeacher className="mr-2"/> Instructors</Link>
@@ -197,7 +197,7 @@ const Dashboard = () => {
         </>
       }
        {
-        currentUser.role === 'instructor' && 
+         currentUser.request === 'Approved' && 
         <>
           <Link ><button  className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold leading-6 capitalize duration-100 transform border-2 rounded-sm cursor-pointer border-amber-300 focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 focus:outline-none sm:w-auto sm:px-6 border-text  hover:shadow-lg hover:-translate-y-1">
           Create New Course</button> </Link>

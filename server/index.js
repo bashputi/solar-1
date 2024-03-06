@@ -33,16 +33,7 @@ app.post("/users/register", async(req, res) => {
     try {
         let {firstname, lastname, username, email, password, role} = req.body;
         const id = uuidv4();
-        console.log({
-            firstname,
-            lastname,
-            username,
-            email,
-            password,
-            role
-        })
         let hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword);
 
         pool.query(
             `SELECT * FROM users
@@ -52,7 +43,6 @@ app.post("/users/register", async(req, res) => {
                 if(err){
                     throw err;
                 }
-                console.log(results.rows);
                 if(results.rows.length > 0){
                     res.status(400).json({
                         status: 400,
@@ -93,7 +83,6 @@ app.post("/users/register", async(req, res) => {
 app.post("/users/login", async(req, res) => {
         try {
             let {email, password} = req.body;
-            console.log({email, password});
             pool.query(
                 `SELECT * FROM users
                 WHERE email = $1`,
@@ -104,10 +93,7 @@ app.post("/users/login", async(req, res) => {
                     }
                     console.log(results.rows);
                     if(results.rows.length > 0){
-                        console.log('user exist');
-
                     const user = results.rows[0];
-                    console.log(user);
 
                    bcrypt.compare(password, user.password, (err, isMatch) => {
                     if(err){
@@ -115,28 +101,21 @@ app.post("/users/login", async(req, res) => {
                     }
                     if(isMatch){
                         const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
-                         console.log(token)
-                        console.log('matched')
                         res.status(200).json({
                             token ,
                             status: 201,
                             success: true,
                             message: "Logged in Successfully",
                           });
-
                     }else{
-                        console.log('password is incorrect');
-                        console.log('user not exist');
                         res.status(400).json({
                             status: 400,
                             message: "password is incorrect",
                           });
-                          return;
+                      return;
                     }
                    })
-
                     }else{
-                        console.log('user not exist');
                         res.status(400).json({
                             status: 400,
                             message: "Email does not exist!!",
@@ -154,7 +133,6 @@ app.post("/users/login", async(req, res) => {
 app.post("/users/google", async(req, res) => {
     try {
         let { firstname, lastname, username, email, password, role } = req.body;
-        console.log({ firstname, lastname, username, email, password, role});
         const id = uuidv4();
         let hashedPassword = await bcrypt.hash(password, 10);
        
@@ -167,7 +145,6 @@ app.post("/users/google", async(req, res) => {
                     console.log('server error', err);
                     return res.status(500).json({ error: 'Server error occurred' });
                 }
-      
                 if (results && results.rows.length > 0) {
                     const user = results.rows[0];
                     console.log(user)
@@ -264,7 +241,7 @@ app.get('/students', async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  });
+});
 
 // GET /instructors for usestudents hook
 app.get('/instructors', async (req, res) => {
@@ -274,7 +251,7 @@ app.get('/instructors', async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  });
+});
   
 // PATCH /users/bio/:id
 app.patch('/users/bio/:id', async(req, res) => {
@@ -323,7 +300,6 @@ res.json(result.rows[0]);
 app.patch('/users/profile', async(req, res) => {
 try {
     const {profileimage, email, coverimage} = req.body;
-    console.log({profileimage, email, coverimage})
     const addColumnsQuery = `
     DO $$
     BEGIN
@@ -350,7 +326,6 @@ if (result.rowCount === 0) {
     return res.status(404).json({ error: "Update faild" });
 }
 res.json(result.rows[0]);
-
 } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
 }
@@ -362,7 +337,6 @@ app.delete('/users/coverphoto/:id', async(req, res) => {
         const { id } = req.params;
     const deleteQuery = 'UPDATE users SET coverimage = NULL WHERE id = $1';
     await pool.query(deleteQuery, [id]);
-
     res.status(200).json({ message: 'Cover photo deleted successfully.' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -374,24 +348,19 @@ app.post('/users/password/:id', async (req, res) => {
     try {
         const { password, newpassword } = req.body;
         const { id } = req.params;
-
         const results = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
         const user = results.rows[0];
-
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log(isMatch)
-
         if (!isMatch) {
             res.status(201).json({ message: 'Current password is incorrect' });
             return;
         }
         const hashedPassword = await bcrypt.hash(newpassword, 10);
         await pool.query(`UPDATE users SET password = $1 WHERE id = $2`, [hashedPassword, id]);
-
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error updating password:', error);
@@ -403,11 +372,7 @@ app.post('/users/password/:id', async (req, res) => {
 app.patch('/users/request/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const {request} = req.body
-        console.log(id, request);
-        const results = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
-        const user = results.rows[0];
-
+        const {request} = req.body;
         const addColumnsQuery = `
         DO $$
         BEGIN
@@ -430,28 +395,87 @@ app.patch('/users/request/:id', async (req, res) => {
             return res.status(404).json({ error: "Update faild" });
         }
         res.json(result.rows[0]);
-
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' }); 
     }
-})
+});
 
+//PATCH for approving instructor request
 app.patch('/index/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-
         const results = await pool.query('UPDATE users SET request = $1 WHERE id = $2 RETURNING *', [status, id]);
         if (results.rows.length === 0) {
-            // No user found with the provided ID
             return res.status(404).json({ error: 'User not found' });
         }
-
-        const user = results.rows[0];
-        console.log(user);
-        res.status(200).json({ message: 'Status updated successfully', user });
+        res.status(200).json({ message: 'Status updated successfully' });
     } catch (error) {
-        console.error('Error updating status:', error.message);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST /addcourse to add course
+app.post('/addcourse', async (req, res) => {
+    try {
+        const { name, category, duration, details } = req.body;
+        const id = uuidv4();
+        console.log({ name, category, duration, details });
+        
+        pool.query('INSERT INTO course (id, name, category, duration, details) VALUES ($1, $2, $3, $4, $5) RETURNING *', [id, name, category, duration, details],
+        (error, result) => {
+            if (error) {
+                console.error('Error executing query:', error);
+                return res.status(201).json({ message: 'Failed to add course' });
+            } else {
+                console.log('Inserted course:', result.rows[0]);
+                return res.status(200).json({ message: 'Course added successfully', course: result.rows[0] });
+            }
+        });
+        
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+//GET /allcourse
+app.get('/allcourse', async(req, res) => {
+    try {
+        const users = await pool.query("SELECT * FROM course;")
+        res.status(200).json({message: "Course are returned", data: users.rows});
+    } catch (error) {
+        res.json({error: error.message}); 
+    }
+});
+
+//PATCH for approving instructor request
+app.patch('/allcourse/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const addColumnsQuery = `
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'course' AND column_name = 'request') THEN
+                ALTER TABLE course ADD COLUMN request TEXT;
+            END IF;
+        END
+        $$;
+        `;
+        await pool.query(addColumnsQuery);
+        const updateQuery = {
+        text: `UPDATE course 
+            SET request = COALESCE($1, request)
+            WHERE id = $2
+            RETURNING *`,
+        values: [status, id],
+        };
+        const result = await pool.query(updateQuery);
+        if (result.rowCount === 0) {
+            return res.status(201).json({ message: "Update faild" });
+        }
+        res.json({ message: "Update successful!!" });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
     }
 });

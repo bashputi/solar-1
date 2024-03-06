@@ -1,6 +1,6 @@
 CREATE DATABASE authdb;
 
-CREATE TABLE use (
+CREATE TABLE users (
     id VARCHAR(255) PRIMARY KEY,
     firstname VARCHAR(200),
     lastname VARCHAR(200),
@@ -19,3 +19,11 @@ DELETE FROM users;
 SELECT * FROM users;
 
 DROP TABLE users;
+
+CREATE TABLE course (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(200),
+    category VARCHAR(200),
+    duration VARCHAR(200),
+    details VARCHAR(500)
+);

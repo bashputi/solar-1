@@ -2,7 +2,7 @@ import useStudents from "../../hooks/useStudents";
 
 
 const Students = () => {
-    const [students, refetch] = useStudents();
+    const [students] = useStudents();
     console.log(students)
     
     return (
