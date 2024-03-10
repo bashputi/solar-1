@@ -16,7 +16,6 @@ import Profile from "../component/settings/Profile";
 import Password from "../component/settings/Password";
 import SocialProfile from "../component/settings/SocialProfile";
 import ManageLogin from "../component/settings/ManageLogin";
-import DashboardHome from "../pages/layouts/dashboard/DashboardHome";
 import InstructorDashboard from "../component/InstructorDashboard/InstructorDashboard";
 import Apply from "../component/StudentDashboard/Apply";
 
@@ -50,10 +49,7 @@ const myRouter = createBrowserRouter([
     path: '/dashboard',
     element: <Dashboard></Dashboard>,
     children: [
-        {
-            path: '/dashboard',
-            element: <DashboardHome /> 
-        },
+       
         {
             path: 'admindashboard',
             element: <AdminDashboard />

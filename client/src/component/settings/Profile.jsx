@@ -12,7 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 const Profile = () => {
-    const [currentUser] = useUser();
+    const [currentUser, refetch] = useUser();
     const { register, handleSubmit,  formState: { errors }, } = useForm();
     const editor = useRef(null);
 	const [content, setContent] = useState('');
@@ -33,6 +33,7 @@ const Profile = () => {
    Axios.patch(`/users/bio/${currentUser?.id}`, Item)
             .then((res) => {
                 if(res.request.status === 200){
+                    refetch();
                     toast.success('Your Profile Updated Successfully!!', {
                         position: "top-right",
                         autoClose: 3000,
@@ -40,7 +41,6 @@ const Profile = () => {
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                    
                       });
                 }
             })
@@ -70,7 +70,7 @@ const Profile = () => {
                 }
                 const profileRes = await Axios.patch(`/users/profile`, profileImage); 
                 if (profileRes.data) {
-                    console.log(profileRes.data.profileimage)
+                    refetch();
                   
                     toast.success('Profile Image Updated Successfully!!', {
                         position: "top-right",
@@ -79,7 +79,6 @@ const Profile = () => {
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        onClose: () => location.reload()
                       });   
                 }
             }
@@ -105,6 +104,7 @@ const Profile = () => {
                 }
                 const coverRes = await Axios.patch(`/users/profile`, coverImage); 
                 if (coverRes.data) {
+                    refetch();
                     toast.success('cover Image Updated Successfully!!', {
                         position: "top-right",
                         autoClose: 3000,
@@ -112,7 +112,6 @@ const Profile = () => {
                         closeOnClick: true,
                         pauseOnHover: true,
                         draggable: true,
-                        onClose: () => location.reload()
                       });   
                 }
             }
@@ -125,6 +124,7 @@ const Profile = () => {
         Axios.delete(`/users/coverphoto/${id}`)
         .then(res => {
             if (res.status === 200) {
+                refetch();
                 toast.success(res.data.message, {
                     position: "top-right",
                     autoClose: 3000,
@@ -132,7 +132,6 @@ const Profile = () => {
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                    onClose: () => location.reload()
                   });
             }
         })

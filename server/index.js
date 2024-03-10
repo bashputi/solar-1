@@ -4,12 +4,47 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-
+const nodemailer = require("nodemailer");
 const { Client } = require('@vercel/postgres');
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
 const pool = require("./db");
 const app = express();
 const PORT = 3001;
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'rimeislam672@gmail.com',
+        pass: 'unop cgid uawx fgbo'
+    }
+});
+
+//Generate OTP
+const generateOTP = () => {
+    const digits = '0123456789';
+    let OTP = "";
+    for (let i = 0; i < 6; i++) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+    }
+    return OTP;
+};
+//send OTP via Email
+const sendOTP = async (email, otp) => {
+    try {
+        const mailOptions = {
+            from: 'rimeislam672@gmail.com',
+            to: email,
+            subject: 'OTP Verification',
+            text: `Your OTP for verification is: ${otp}`
+        };
+        
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully')
+    } catch (error) {
+        console.error("Error sending email:", error);
+        throw error;
+    }
+};
 
 app.use(express.json());
 app.listen(PORT, () =>{
@@ -36,9 +71,7 @@ app.post("/users/register", async(req, res) => {
         let hashedPassword = await bcrypt.hash(password, 10);
 
         pool.query(
-            `SELECT * FROM users
-            WHERE email = $1`,
-            [email],
+            `SELECT * FROM users WHERE email = $1`, [email],
             (err, results) => {
                 if(err){
                     throw err;
@@ -80,46 +113,59 @@ app.post("/users/register", async(req, res) => {
 });
 
 // POST /login 
-app.post("/users/login", async(req, res) => {
+app.patch("/users/login", async(req, res) => {
         try {
             let {email, password} = req.body;
-            pool.query(
-                `SELECT * FROM users
-                WHERE email = $1`,
-                [email],
-                (err, results) => {
-                    if(err){
-                        throw err;
-                    }
-                    console.log(results.rows);
+            pool.query(`SELECT * FROM users WHERE email = $1`,[email],
+                async(err, results) => {
+                    if(err){throw err; }
                     if(results.rows.length > 0){
                     const user = results.rows[0];
 
-                   bcrypt.compare(password, user.password, (err, isMatch) => {
+                   bcrypt.compare(password, user.password, async(err, isMatch) => {
                     if(err){
                         console.log("pass not compared", err);
                     }
                     if(isMatch){
-                        const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
-                        res.status(200).json({
-                            token ,
+
+                        const otp = generateOTP();
+
+                        const addColumnsQuery = `
+                        DO $$
+                        BEGIN
+                            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'otp') THEN
+                                ALTER TABLE users ADD COLUMN otp TEXT;
+                            END IF;
+                        END
+                        $$;
+                    `;
+                    await pool.query(addColumnsQuery);
+                    const updateQuery = {
+                        text: `UPDATE users 
+                               SET otp = COALESCE($1, otp)
+                               WHERE email = $2
+                               RETURNING *`,
+                        values: [otp, email],
+                    };
+                    const result = await pool.query(updateQuery);
+                        
+ 
+                    if (result.rows.length > 0) {
+                        await sendOTP(email, otp);
+                       res.status(200).json({
                             status: 201,
                             success: true,
-                            message: "Logged in Successfully",
+                            message: "Verify OTP for Vrification",
                           });
-                    }else{
-                        res.status(400).json({
-                            status: 400,
-                            message: "password is incorrect",
-                          });
+                          return 
+                    }
+                 }else{
+                        res.status(400).json({status: 400,message: "password is incorrect" });
                       return;
                     }
                    })
-                    }else{
-                        res.status(400).json({
-                            status: 400,
-                            message: "Email does not exist!!",
-                          });
+                    }else{res.status(400).json({status: 400,
+                            message: "Email does not exist!!",});
                           return;
                     }
                 });
@@ -127,6 +173,29 @@ app.post("/users/login", async(req, res) => {
         } catch (error) {
             res.json({error: error.message});
         }
+});
+
+//Verify OTP route
+app.post('/users/verify-otp', async(req, res) => {
+    try {
+        const { email, otp } = req.body;
+        console.log({ email, otp } )
+        pool.query("SELECT * FROM users WHERE email = $1 AND otp = $2", [email, otp], async (err, results) => {
+          if (err) {
+            throw err;
+          }
+          if (results.rows.length > 0) {
+            const user = results.rows[0];
+            console.log(user)
+            const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
+            res.status(200).json({ token, success: true, message: "Logged in Successfully" });
+          } else {
+            res.status(400).json({ status: 400, message: "OTP verification failed" });
+          }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // POST /google login
@@ -384,17 +453,14 @@ app.patch('/users/request/:id', async (req, res) => {
         `;
         await pool.query(addColumnsQuery);
         const updateQuery = {
-        text: `UPDATE users 
-            SET request = COALESCE($1, request)
-            WHERE id = $2
-            RETURNING *`,
-        values: [request, id],
-        };
+        text: `UPDATE users SET request = COALESCE($1, request)
+            WHERE id = $2 RETURNING *`, values: [request, id],};
+
         const result = await pool.query(updateQuery);
         if (result.rowCount === 0) {
             return res.status(404).json({ error: "Update faild" });
         }
-        res.json(result.rows[0]);
+        res.status(200);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' }); 
     }

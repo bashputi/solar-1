@@ -53,7 +53,9 @@ const GoogleLoginButton = () => {
                 console.log(credentialResponse);
                 let credentialResponseDecoded = jwtDecode(credentialResponse.credential);
                 console.log(credentialResponseDecoded);
+               
                 const { given_name, family_name, name, email } = credentialResponseDecoded;
+                console.log({ given_name, family_name, name, email } )
                 const userData = {
                     firstname: given_name,
                     lastname: family_name,

@@ -11,9 +11,7 @@ const Instructors = () => {
     console.log(value, id)
     try {
        await Axios.patch(`/index/${id}`, { status: value })
-      .then (res => {
-        refetch()
-      })
+      .then (res => {refetch()})
     } catch (error) {
       console.error('Error updating status:', error.message);
     }
@@ -45,9 +43,7 @@ const Instructors = () => {
               <td className="py-4 px-6 truncate">{item.email}</td>
               <td className="py-4 px-6 ">0</td>
               <td className="py-4 px-6 ">
-              <select
-                value={item.request}
-                onChange={(e) => handleSelectChange(e, item.id)}
+              <select value={item.request} onChange={(e) => handleSelectChange(e, item.id)}
                 name="request"
                 className={`select w-30 px-3 py-2 rounded-full select-bordered ${
                     item.request === 'Approved' ? 'bg-green-400' : 

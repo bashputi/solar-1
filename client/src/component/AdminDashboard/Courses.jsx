@@ -17,16 +17,8 @@ const Courses = () => {
     Axios.post('/addcourse', data)
     .then(res => {
      if(res.status === 200){
-        setShowForm(false);
+     setShowForm(false);
       refetch();
-      toast.success(res.data.message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-    });
      }else{
       toast.error(res.data.message, {
         position: "top-right",
@@ -46,7 +38,6 @@ const Courses = () => {
       try {
          await Axios.patch(`/allcourse/${id}`, { status: value })
         .then (res => {
-          console.log(res.data.message)
           if(res.status === 200){
             refetch();
             toast.success(res.data.message, {
@@ -185,7 +176,7 @@ const Courses = () => {
                     value={item.request}
                     onChange={(e) => handleSelectChange(e, item.id)}
                     name="request"
-                    className={`select w-30 px-3 py-2 rounded-full select-bordered ${
+                    className={`select w-30 px-3 py-2 border-2 border-black rounded-full select-bordered ${
                         item.request === 'Publish' ? 'bg-green-400' : 
                         item.request === 'Trash' ? 'bg-red-400' : 
                         item.request === 'Draft' ? 'bg-gray-400' : 
