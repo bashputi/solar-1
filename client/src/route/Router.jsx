@@ -18,6 +18,7 @@ import SocialProfile from "../component/settings/SocialProfile";
 import ManageLogin from "../component/settings/ManageLogin";
 import InstructorDashboard from "../component/InstructorDashboard/InstructorDashboard";
 import Apply from "../component/StudentDashboard/Apply";
+import Shedule from "../component/InstructorDashboard/Shedule";
 
 
 
@@ -73,6 +74,10 @@ const myRouter = createBrowserRouter([
         {
             path: 'studentdashboard',
             element: <StudentDashboard />
+        },
+        {
+            path: 'shedule',
+            element: <Shedule />
         },
         {
             path: 'instructor',

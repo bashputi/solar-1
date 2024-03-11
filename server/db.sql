@@ -27,3 +27,10 @@ CREATE TABLE course (
     duration VARCHAR(200),
     details VARCHAR(500)
 );
+CREATE TABLE schedule (
+    id VARCHAR(255) PRIMARY KEY,
+    startDate VARCHAR(200),
+    endDate VARCHAR(200),
+    offStart VARCHAR(200)
+    offEnd VARCHAR(200)
+);

@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import useUser from "../../../hooks/useUser";
 import useAxios from "../../../hooks/useAxios";
+import { FaCalendarAlt } from "react-icons/fa";
 import  { useState, useEffect } from 'react';
 import StudentDashboard from "../../../component/StudentDashboard/StudentDashboard";
 import InstructorDashboard from "../../../component/InstructorDashboard/InstructorDashboard";
@@ -109,13 +110,15 @@ const Dashboard = () => {
       }
 {/* Instructor DAshboar     */}
       {
-        currentUser.request === 'Approved' && 
+        currentUser.role === 'instructor' && 
         <>
         <h1 className="text-lg font-semibold text-green-600">Instructor Dashboard</h1>
         <Link to="/dashboard/instructor" className="flex items-center px-4 py-2 text-gray-100 hover:bg-gray-700" >
         <FaBars className="mr-2"/> Dashboard</Link>
         <Link to="/dashboard/myprofile" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
         <CgProfile className="mr-2" />My Profile</Link>
+        <Link to="/dashboard/shedule" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
+        <FaCalendarAlt  className="mr-2" />My Shedule</Link>
         <Link className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
         <PiMicrophoneStageFill className="mr-2" />Announcements</Link>
         <Link className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700">
@@ -190,7 +193,7 @@ const Dashboard = () => {
           )}
         </>
       }
-       {currentUser.request === 'Approved' && 
+       {currentUser.role === 'instructor' && 
         <>
           <Link ><button  className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold leading-6 capitalize duration-100 transform border-2 rounded-sm cursor-pointer border-amber-300 focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 focus:outline-none sm:w-auto sm:px-6 border-text  hover:shadow-lg hover:-translate-y-1">
           Create New Course</button> </Link>

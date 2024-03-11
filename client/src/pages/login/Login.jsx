@@ -14,12 +14,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [recaptchaValue, setRecaptchaValue] = useState('');
   const [showOtpForm, setShowOtpForm] = useState(false);
-  console.log(email, otp)
+  console.log(showOtpForm)
 
     const handleLogin = async(e) => {
         e.preventDefault();
     const form = e.target;
     const Item ={email: form.email.value, password: form.password.value};
+    console.log(Item)
      if (!recaptchaValue) {
       toast.error("Please complete the reCAPTCHA challenge", {
           position: "top-center", autoClose: 3000,})
@@ -186,7 +187,7 @@ const Login = () => {
            </div>
          </div>
          )}
-         { setShowOtpForm && (
+         { showOtpForm && (
           <div className="flex flex-1 flex-col  justify-center space-y-5 max-w-md mx-auto ">
           <div className="flex flex-col space-y-2 text-center">
             <h2 className="text-3xl md:text-4xl font-bold">Confirm OTP</h2>

@@ -116,6 +116,7 @@ app.post("/users/register", async(req, res) => {
 app.patch("/users/login", async(req, res) => {
         try {
             let {email, password} = req.body;
+            console.log({email, password})
             pool.query(`SELECT * FROM users WHERE email = $1`,[email],
                 async(err, results) => {
                     if(err){throw err; }
@@ -129,7 +130,7 @@ app.patch("/users/login", async(req, res) => {
                     if(isMatch){
 
                         const otp = generateOTP();
-
+console.log(otp)
                         const addColumnsQuery = `
                         DO $$
                         BEGIN
@@ -325,7 +326,6 @@ app.get('/instructors', async (req, res) => {
 // PATCH /users/bio/:id
 app.patch('/users/bio/:id', async(req, res) => {
 try {
-   
     let { firstname, lastname, skill, phn, bio } = req.body;
     const { id } = req.params;
     const addColumnsQuery = `
@@ -544,4 +544,19 @@ app.patch('/allcourse/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
+});
+
+//PATCH /schedule/:id instructor schedule
+app.patch('/schedule/:id', async(req, res) => {
+try {
+    const { id } = req.params;
+        const { startDate, endDate } = req.body;
+        console.log({ startDate, endDate });
+
+
+
+        
+} catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+}
 });

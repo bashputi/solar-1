@@ -4,6 +4,9 @@ import './index.css'
 import { RouterProvider } from 'react-router-dom'
 import myRouter from './route/Router';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import 'react-date-range/dist/styles.css'; 
+import 'react-date-range/dist/theme/default.css';
+import 'react-toastify/dist/ReactToastify.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 const queryClient = new QueryClient()
 
