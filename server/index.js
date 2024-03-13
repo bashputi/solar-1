@@ -547,11 +547,11 @@ app.patch('/allcourse/:id', async (req, res) => {
 });
 
 //PATCH /schedule/:id instructor schedule
-app.patch('/schedule/:id', async(req, res) => {
+app.patch('/time/:id', async(req, res) => {
 try {
     const { id } = req.params;
-        const { startDate, endDate } = req.body;
-        console.log({ startDate, endDate });
+        const Item = req.body;
+        console.log(Item);
 
 
 
