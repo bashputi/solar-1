@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import useAxios from "../../hooks/useAxios";
 import useUser from "../../hooks/useUser";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Schedule = () => {
     const Axios = useAxios();
@@ -9,6 +12,10 @@ const Schedule = () => {
     const [startDate, setStartDate] = useState(new Date());
     const [startTimes, setStartTimes] = useState(Array(7).fill('13:00')); 
     const [endTimes, setEndTimes] = useState(Array(7).fill('17:00')); 
+    const [dataSaved, setDataSaved] = useState(() => {
+        const savedData = localStorage.getItem('dataSaved');
+        return savedData ? JSON.parse(savedData) : false;
+    });
 
     useEffect(() => {
         const endDate = new Date(startDate);
@@ -76,15 +83,40 @@ const Schedule = () => {
             const slots = generateTimeSlots( day, date, startTime, endTime);
             timeSlots.push(...slots);
         });
-        console.log(timeSlots);
-        console.log(currentUser.id)
+
         Axios.post(`/time/${currentUser.id}`, timeSlots)
             .then(res => {
                 console.log(res);
+                toast.success(res.data.message, {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                  });
+                setDataSaved(true); 
+                localStorage.setItem('dataSaved', true); 
             })
             .catch(error => {
                 console.error(error);
             });
+    };
+
+    const handleDelete = () => {
+     Axios.delete(`/schedule/${currentUser.id}`)
+     .then(res => {
+        toast.success(res.data.message, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+            setDataSaved(false); 
+            localStorage.setItem('dataSaved', false);
+     })
     };
 
     return (
@@ -96,7 +128,7 @@ const Schedule = () => {
                         const currentDate = new Date(startDate);
                         currentDate.setDate(currentDate.getDate() + index);
                         const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
-                        const formattedDate = currentDate.toLocaleDateString(); // Get formatted date
+                        const formattedDate = currentDate.toLocaleDateString(); 
                         
                         return (
                             <div key={index} className='mb-8 text-xl'>
@@ -107,7 +139,7 @@ const Schedule = () => {
                                     className='mr-4'
                                 />
                                 <label className='font-semibold mr-8'>{dayName}</label>
-                                <span className='mr-16'>({formattedDate})</span> {/* Include formatted date */}
+                                <span className='mr-16'>({formattedDate})</span> 
                                 <input
                                     type="time"
                                     value={startTimes[index]}
@@ -124,9 +156,14 @@ const Schedule = () => {
                             </div>
                         );
                     })}
-                    <button className="group mt-10 relative w-28 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600" type="button" onClick={handleApply}>Apply</button>
+                    {dataSaved ? (
+                        <button className="group mt-10 relative w-28 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600" type="button" onClick={handleDelete}>Delete</button>
+                    ) : (
+                        <button className="group mt-10 relative w-28 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600" type="button" onClick={handleApply}>Apply</button>
+                    )}
                 </form>
             </div>
+            <ToastContainer />
         </div>
     );
 };

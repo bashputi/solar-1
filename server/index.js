@@ -546,28 +546,57 @@ app.patch('/allcourse/:id', async (req, res) => {
     }
 });
 
-//PATCH /schedule/:id instructor schedule
+//PATCH /time/:id instructor schedule
 app.post('/time/:id', async (req, res) => {
     const { id: instructorId } = req.params;
-    console.log(instructorId);
     const scheduleData = req.body.map(entry => ({
         ...entry,
         id: uuidv4(),
         instructorId: instructorId,
         email: ''
     }));
-    console.log(scheduleData);
-    try {
-        for (const entry of scheduleData) {
-            console.log(entry);
+
+    async function saveScheduleEntries(entries) {
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN'); 
+            for (const entry of entries) {
+                const { id, instructorId, day, date, time, email } = entry;
+                const query = {
+                    text: 'INSERT INTO schedule (id, instructorId, day, date, time, email) VALUES ($1, $2, $3, $4, $5, $6)',
+                    values: [id, instructorId, day, date, time, email]
+                };
+                await client.query(query);
+            }
+            await client.query('COMMIT'); 
+        } catch (error) {
+            await client.query('ROLLBACK'); 
+            throw error; 
+        } finally {
+            client.release(); 
         }
-
-
-
+    }
+    try {
+        await saveScheduleEntries(scheduleData);
+        res.status(200).json({ message: 'Schedule data saved successfully' });
     } catch (error) {
-        console.error('Error updating schedule data:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
 
+//DELETE /schedule/:id
+app.delete('/schedule/:id', async (req, res) => {
+    try {
+        const { id: instructorId } = req.params;
+        const deleteQuery = 'DELETE FROM schedule WHERE instructorId = $1';
+        const result = await pool.query(deleteQuery, [instructorId]);
+      
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'No schedule entries found for the provided instructor ID.' });
+        }
+        res.status(200).json({ message: 'Schedule entries deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
