@@ -547,16 +547,27 @@ app.patch('/allcourse/:id', async (req, res) => {
 });
 
 //PATCH /schedule/:id instructor schedule
-app.patch('/time/:id', async(req, res) => {
-try {
-    const { id } = req.params;
-        const Item = req.body;
-        console.log(Item);
+app.post('/time/:id', async (req, res) => {
+    const { id: instructorId } = req.params;
+    console.log(instructorId);
+    const scheduleData = req.body.map(entry => ({
+        ...entry,
+        id: uuidv4(),
+        instructorId: instructorId,
+        email: ''
+    }));
+    console.log(scheduleData);
+    try {
+        for (const entry of scheduleData) {
+            console.log(entry);
+        }
 
 
 
-        
-} catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
-}
+    } catch (error) {
+        console.error('Error updating schedule data:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 });
+
+

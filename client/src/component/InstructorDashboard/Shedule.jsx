@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import useAxios from "../../hooks/useAxios";
 import useUser from "../../hooks/useUser";
-import { DateRangePicker } from 'react-date-range';
-import { format } from 'date-fns';
 
 const Schedule = () => {
     const Axios = useAxios();
@@ -46,21 +44,41 @@ const Schedule = () => {
         setEndTimes(newEndTimes);
     };
 
+    const generateTimeSlots = (day, date, startTime, endTime) => {
+        const timeSlots = [];
+        const start = new Date(`${date} ${startTime}`);
+        const end = new Date(`${date} ${endTime}`);
+        
+        while (start < end) {
+            const timeString = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`;
+            timeSlots.push({
+                day,
+                date,
+                time: timeString
+            });
+            start.setHours(start.getHours() + 1);
+        }
+    
+        return timeSlots;
+    };
+    
     const handleApply = () => {
         if (selectedDays.length === 0) {
             alert('Please select at least one day.');
             return;
         }
-
-        const data = selectedDays.map(({ day, date }, index) => ({
-            day,
-            date,
-            startTime: startTimes[index],
-            endTime: endTimes[index]
-        }));
-        console.log(data)
-
-        Axios.patch(`/time/${currentUser.id}`, data)
+    
+        const timeSlots = [];
+        selectedDays.forEach(({ day, date}, index) => {
+           
+            const startTime = startTimes[index];
+            const endTime = endTimes[index];
+            const slots = generateTimeSlots( day, date, startTime, endTime);
+            timeSlots.push(...slots);
+        });
+        console.log(timeSlots);
+        console.log(currentUser.id)
+        Axios.post(`/time/${currentUser.id}`, timeSlots)
             .then(res => {
                 console.log(res);
             })
@@ -69,58 +87,8 @@ const Schedule = () => {
             });
     };
 
-    // Calendar function 
-    const [openDate, setOpenDate] = useState(false);
-    const [date, setDate] = useState({
-        startDate: new Date(),
-        endDate: new Date(),
-        key: 'selection'
-    });
-
-    const handleChange = (ranges) => {
-        setDate(ranges.selection);
-    };
-
-    const handleClick = () => {
-        setOpenDate((prev) => !prev);
-    };
-
-    const handleApp = () => {
-        const Item = {
-            startDate: date.startDate,
-            endDate: date.endDate
-        };
-        
-        Axios.patch(`/schedule/${currentUser.id}`, Item)
-            .then(res => console.log(res))
-            .catch(error => console.error(error));
-    };
-
     return (
         <div>
-            <div className='pl-4'>
-                <h1 className='text-2xl font-bold pt-8 pb-3 '>Scheduled Events</h1>
-                <p className='pb-8 '>Your classes will start from <span className='text-green-600 font-semibold'>{`${format(date.startDate, 'dd/MM/yyyy')}`}</span> to <span className='text-green-600 font-semibold'>{`${format(date.endDate, 'dd/MM/yyyy')}`}</span>.</p>
-                <div className=''>
-                    <span onClick={handleClick} className="group mb-10 relative w-36 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Make Schedule</span>
-                    {openDate && (
-                        <div className='bg-white rounded-lg px-5 py-5 w-[50vw]'>
-                            <DateRangePicker
-                                onChange={handleChange}
-                                ranges={[date]}
-                                showSelectionPreview={true}
-                                moveRangeOnFirstSelection={false}
-                                months={2} 
-                                minDate={new Date()}
-                            />
-                            <div className='flex justify-center gap-5'>
-                                <button onClick={handleClick} className="group mt-10 relative w-28 flex justify-center py-2 border border-transparent text-sm font-medium rounded-md hover:underline ">Cancel</button>
-                                <button onClick={handleApp} className="group mt-10 relative w-28 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Apply</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
             <div className='pl-4'>
                 <h1 className='text-2xl font-semibold mb-5'>Schedule Time Frames</h1>
                 <form className='bg-white w-[50vw] px-8 py-8 rounded-lg'>
