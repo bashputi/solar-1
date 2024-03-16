@@ -13,7 +13,7 @@ const Home = () => {
     
 
    const handleLogOut = async() => {
-    await fetch("http://localhost:3001/users/logout", {
+    await fetch("https://vercel-solar.vercel.app/users/logout", {
       method: "POST",
       headers: {
         "content-type": "application/json"},

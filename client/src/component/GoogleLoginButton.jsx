@@ -8,7 +8,7 @@ const GoogleLoginButton = () => {
   const navigate = useNavigate();
   const sendUserDataToBackend = (userData) => {
    console.log(userData)
-      fetch('http://localhost:3001/users/google', {
+      fetch('https://vercel-solar.vercel.app/users/google', {
           method: 'POST',
          
           headers: {

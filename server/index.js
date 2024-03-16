@@ -9,7 +9,7 @@ const { Client } = require('@vercel/postgres');
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
 const pool = require("./db");
 const app = express();
-const PORT = 3001;
+const PORT = process.env.DB_PORT;
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -622,6 +622,7 @@ app.patch('/booked/:id', async (req, res) => {
                 if (results.rows.length > 0) {
                     const user = results.rows[0];
                     console.log(user);
+    
                     pool.query(
                         `UPDATE schedule SET email = $1 WHERE id = $2`,
                         [email, id],
@@ -629,7 +630,21 @@ app.patch('/booked/:id', async (req, res) => {
                             if (err) {
                                 throw err;
                             }
-                            console.log('Email updated successfully');
+                            const mail = {
+                                from: 'rimeislam672@gmail.com',
+                                to: email,
+                                subject: 'OTP Verification',
+                                text: `Your class on Solar has been booked for ${user.date} at ${user.time}`
+                            };
+                            
+                            transporter.sendMail(mail, (error, info) => {
+                                if (error) {
+                                    console.error('Error occurred while sending email:', error);
+                                } else {
+                                    console.log('Email sent successfully:', info.response);
+                                }
+                            });
+                    
                             res.status(200).json({ message: 'Email updated successfully' });
                         }
                     );
@@ -637,9 +652,10 @@ app.patch('/booked/:id', async (req, res) => {
                     res.status(404).json({ error: 'Schedule not found' });
                 }
             }
-        );
+        )
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 

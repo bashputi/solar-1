@@ -4,6 +4,8 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import useAxios from "../../hooks/useAxios";
 import useUser from "../../hooks/useUser";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const Enrolled = () => {
@@ -30,11 +32,24 @@ console.log(schedule)
   const handleButtonClick = async(id) => {
     console.log("Clicked schedule id:", id);
    await Axios.patch(`/booked/${id}`,{email: currentUser.email})
-   .then(res => console.log(res))
+   .then(res =>  {
+      if(res.status === 200) {
+        refetch();
+        toast.success('Your Profile Updated Successfully!!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+})
   };
 
   return (
-    <div className='flex '>
+   <div>
+     <div className='flex '>
  <Calendar
   onChange={handleDateClick}
   value={selectedDate}
@@ -50,19 +65,23 @@ console.log(schedule)
   }}
 />
 {selectedDate && (
-        <div className='bg-white py-5 text-xl font-semibold rounded-md px-5'>
-          {selectedDate.toLocaleDateString()}:
-          {groupedSchedules[selectedDate.toLocaleDateString()] && groupedSchedules[selectedDate.toLocaleDateString()].map(schedule => (
-            <button 
-              className='block group relative w-36 py-2.5 my-3 px-4 text-sm font-medium rounded-md text-white bg-amber-500 '
-              key={schedule.id}
-              onClick={() => handleButtonClick(schedule.id)} // Pass id to handleButtonClick function
-            >
-              {schedule.time}
-            </button>
-          ))}   </div>
-          )}
+  <div className='bg-white py-5 text-xl font-semibold rounded-md px-5'>
+    {selectedDate.toLocaleDateString()}:
+    {groupedSchedules[selectedDate.toLocaleDateString()] && groupedSchedules[selectedDate.toLocaleDateString()].map(schedule => (
+      <button 
+      className={`block group relative w-36 py-2.5 my-3 px-4 text-sm font-medium rounded-md text-white ${schedule.email ? 'bg-red-500' : 'bg-green-500'}`}
+        key={schedule.id}
+        onClick={() => handleButtonClick(schedule.id)}
+        disabled={schedule.email !== ''} // Disable button if email is present
+      >
+        {schedule.email ? 'Booked' : schedule.time}
+      </button>
+    ))}
+  </div>
+)}
     </div>
+      <ToastContainer />
+   </div>
   );
 };
 
