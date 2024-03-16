@@ -19,6 +19,7 @@ import ManageLogin from "../component/settings/ManageLogin";
 import InstructorDashboard from "../component/InstructorDashboard/InstructorDashboard";
 import Apply from "../component/StudentDashboard/Apply";
 import Shedule from "../component/InstructorDashboard/Shedule";
+import Enrolled from "../component/StudentDashboard/Enrolled";
 
 
 
@@ -82,6 +83,10 @@ const myRouter = createBrowserRouter([
         {
             path: 'instructor',
             element: <InstructorDashboard />
+        },
+        {
+            path: 'enrolled',
+            element: <Enrolled/>
         },
         {
             path: '/dashboard/settings',

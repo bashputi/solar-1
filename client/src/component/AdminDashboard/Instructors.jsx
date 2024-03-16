@@ -4,7 +4,7 @@ import useAxios from '../../hooks/useAxios';
 const Instructors = () => {
   const [instructors, refetch] = useInstructors();
   const Axios = useAxios();
-  
+  console.log(instructors)
 
   const handleSelectChange = async (e, id) => {
     const { value } = e.target;

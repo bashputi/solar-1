@@ -128,9 +128,8 @@ app.patch("/users/login", async(req, res) => {
                         console.log("pass not compared", err);
                     }
                     if(isMatch){
-
                         const otp = generateOTP();
-console.log(otp)
+                        console.log(otp)
                         const addColumnsQuery = `
                         DO $$
                         BEGIN
@@ -149,8 +148,6 @@ console.log(otp)
                         values: [otp, email],
                     };
                     const result = await pool.query(updateQuery);
-                        
- 
                     if (result.rows.length > 0) {
                         await sendOTP(email, otp);
                        res.status(200).json({
@@ -187,7 +184,6 @@ app.post('/users/verify-otp', async(req, res) => {
           }
           if (results.rows.length > 0) {
             const user = results.rows[0];
-            console.log(user)
             const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
             res.status(200).json({ token, success: true, message: "Logged in Successfully" });
           } else {
@@ -471,7 +467,7 @@ app.patch('/index/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-        const results = await pool.query('UPDATE users SET request = $1 WHERE id = $2 RETURNING *', [status, id]);
+        const results = await pool.query('UPDATE users SET request = $1, role = $2 WHERE id = $3 RETURNING *', [status, 'instructor' ,id]);
         if (results.rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -597,6 +593,53 @@ app.delete('/schedule/:id', async (req, res) => {
         res.status(200).json({ message: 'Schedule entries deleted successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+//GET /allcourse
+app.get('/allschedule', async(req, res) => {
+    try {
+        const users = await pool.query("SELECT * FROM schedule;")
+        res.status(200).json({message: "Schedule are returned", data: users.rows});
+    } catch (error) {
+        res.status(500).json({error: error.message}); 
+    }
+});
+
+//PATCH /booked/:id
+app.patch('/booked/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { email } = req.body;
+        console.log(id, email);
+        pool.query(
+            `SELECT * FROM schedule WHERE id = $1`,
+            [id],
+            async (err, results) => {
+                if (err) {
+                    throw err;
+                }
+                if (results.rows.length > 0) {
+                    const user = results.rows[0];
+                    console.log(user);
+                    pool.query(
+                        `UPDATE schedule SET email = $1 WHERE id = $2`,
+                        [email, id],
+                        (err, results) => {
+                            if (err) {
+                                throw err;
+                            }
+                            console.log('Email updated successfully');
+                            res.status(200).json({ message: 'Email updated successfully' });
+                        }
+                    );
+                } else {
+                    res.status(404).json({ error: 'Schedule not found' });
+                }
+            }
+        );
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 

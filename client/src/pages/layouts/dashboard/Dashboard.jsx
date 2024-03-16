@@ -29,7 +29,7 @@ const Dashboard = () => {
   const [currentUser, refetch] = useUser();
   const Axios = useAxios();
   const [requestSent, setRequestSent] = useState(false);
-  console.log(requestSent, currentUser.request)
+  console.log(requestSent, currentUser)
 
   // const history = useHistory();
   
@@ -89,7 +89,7 @@ const Dashboard = () => {
 
       <Link to="/dashboard/myprofile" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <CgProfile className="mr-2" />  My Profile </Link>
-      <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
+      <Link to="/dashboard/enrolled" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <FaGraduationCap  className="mr-2" />  Enrolled Courses</Link>
       <Link to="/dashboard/" className="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-700" >
         <BsBookmarkFill className="mr-2" />  Wishlist </Link>

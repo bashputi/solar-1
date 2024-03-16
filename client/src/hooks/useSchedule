@@ -1,0 +1,20 @@
+import useAxios from "./useAxios";
+import { useQuery } from "@tanstack/react-query";
+
+const useSchedule = () => {
+    const Axios = useAxios();
+    
+    const {refetch, data: schedule = []} = useQuery({
+        queryKey: ['schedule'],
+        queryFn: async () =>{
+            const res = await Axios.get('/allschedule')
+            console.log(res.data)
+            return res.data.data || [];
+        }
+    })
+
+
+return [schedule, refetch]
+};
+
+export default useSchedule;
