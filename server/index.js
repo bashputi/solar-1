@@ -1,15 +1,56 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const http = require("http");
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
+const { Server } = require("socket.io");
 const jwt = require('jsonwebtoken');
+const { server } = require("socket.io");
 const nodemailer = require("nodemailer");
 const { Client } = require('@vercel/postgres');
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
 const pool = require("./db");
+
 const app = express();
-const PORT = process.env.DB_PORT;
+const PORT = process.env.PORT || 3001;
+
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: [
+            'https://versed-yard.surge.sh',
+            'http://localhost:5173'
+        ],
+        credentials: true // Corrected the spelling
+    }
+});
+io.on("connect", (socket) => {
+    console.log(`Socket Connected`, socket.id);
+});
+
+app.use(express.json());
+app.use(cors());
+
+httpServer.listen(PORT, () => {
+    console.log(`Server is running at port:${PORT}`);
+});
+
+// app.listen(PORT, () =>{
+//     console.log(`Server is running at port:${PORT}`);
+// });
+
+// app.use(cors({
+//     origin: [
+//         'https://versed-yard.surge.sh',
+//         'http://localhost:5173'
+//     ],
+//     Credential: true
+// }));
+
+app.get('/', (req, res) => {
+    res.send("hello");
+});
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -45,23 +86,6 @@ const sendOTP = async (email, otp) => {
         throw error;
     }
 };
-
-app.use(express.json());
-app.listen(PORT, () =>{
-    console.log(`Server is running at port:${PORT}`);
-});
-
-app.use(cors({
-    origin: [
-        'https://versed-yard.surge.sh',
-        'http://localhost:5173'
-    ],
-    Credential: true
-}));
-
-app.get('/', (req, res) => {
-    res.send("hello");
-});
 
 // POST /register -> create a user
 app.post("/users/register", async(req, res) => {
@@ -184,6 +208,7 @@ app.post('/users/verify-otp', async(req, res) => {
           }
           if (results.rows.length > 0) {
             const user = results.rows[0];
+            console.log(user)
             const token = jwt.sign(user , secretKey, { expiresIn: '1h' });
             res.status(200).json({ token, success: true, message: "Logged in Successfully" });
           } else {
@@ -214,19 +239,33 @@ app.post("/users/google", async(req, res) => {
                 if (results && results.rows.length > 0) {
                     const user = results.rows[0];
                     console.log(user)
-                    bcrypt.compare(password, user.password, (err, isMatch) => {
+                    bcrypt.compare(password, user.password, async(err, isMatch) => {
                         if (err) {
                             console.log("Error comparing password", err);
                             return res.status(500).json({ error: 'Server error occurred' });
                         }
                         if (isMatch) {
-                            const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
-                            return res.status(200).json({
-                                token,
-                                status: 201,
-                                success: true,
-                                message: "Logged in Successfully",
-                            });
+                            const otp = generateOTP();
+                    console.log(otp)
+                            
+                const updateQuery = {
+                    text: `UPDATE users 
+                           SET otp = COALESCE($1, otp)
+                           WHERE email = $2
+                           RETURNING *`,
+                    values: [otp, email],
+                };
+                const result = await pool.query(updateQuery);
+                if (result.rows.length > 0) {
+                    await sendOTP(email, otp);
+                   res.status(200).json({
+                        status: 201,
+                        success: true,
+                        message: "Verify OTP for Vrification",
+                      });
+                      return 
+                }
+
                         } else {
                             return res.status(400).json({
                                 status: 400,
@@ -235,25 +274,27 @@ app.post("/users/google", async(req, res) => {
                         }
                     });
                 } else {
+                    const otp = generateOTP();
+                    console.log(otp)
                     pool.query(
-                        `INSERT INTO users (id, firstname, lastname, username, email, password, role)
-                        VALUES ($1, $2, $3, $4, $5, $6, $7)
-                        returning *`, [id, firstname, lastname, username, email, hashedPassword, role],
-                        (err, results) => {
+                        `INSERT INTO users (id, firstname, lastname, username, email, password, role, otp)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                        returning *`, [id, firstname, lastname, username, email, hashedPassword, role, otp],
+                        async(err, results) => {
                             if (err) {
                                 console.log("Error inserting user", err);
                                 return res.status(500).json({ error: 'Server error occurred' });
                             }
                             if (results.rows.length > 0) {
                                 const user = results.rows[0];
-                                console.log(user)
-                                const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
-                                return res.status(200).json({
-                                    token,
+                                console.log(user.email)
+                                await sendOTP(user.email, otp);
+                               res.status(200).json({
                                     status: 201,
                                     success: true,
-                                    message: "User Created Successfully",
-                                });
+                                    message: "Verify OTP for Vrification",
+                                  });
+                                  return 
                             }
                         }
                     );

@@ -34,7 +34,7 @@ const Dashboard = () => {
   // const history = useHistory();
   
   const handleLogOut = async() => {
-    await fetch("https://vercel-solar.vercel.app/users/logout", {
+    await fetch("http://localhost:3001/users/logout", {
       method: "POST",
       headers: {
         "content-type": "application/json"},

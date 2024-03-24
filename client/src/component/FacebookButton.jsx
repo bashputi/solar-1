@@ -1,15 +1,13 @@
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from "react-router-dom";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { FacebookLoginButton } from "react-social-login-buttons";
 
-const FacebookButton = () => {
+const FacebookButton = ({ setShowOtpForm, email, setEmail }) => {
     
-const navigate = useNavigate();
 const sendUserDataToBackend = (userData) => {
  console.log(userData)
-    fetch('https://vercel-solar.vercel.app/users/google', {
+    fetch('http://localhost:3001/users/google', {
         method: 'POST',
        
         headers: {
@@ -20,8 +18,6 @@ const sendUserDataToBackend = (userData) => {
     .then(res => res.json())
     .then(data => {
         if(data.success){
-            const Token = data.token;
-            localStorage.setItem('token', Token.toString());
             toast.success(data.message, {
               position: "top-right",
               autoClose: 3000,
@@ -29,7 +25,7 @@ const sendUserDataToBackend = (userData) => {
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              onClose: () => navigate('/')
+              onClose: () => setShowOtpForm(true) 
             });
         }else if(data.status === 400){
         
@@ -64,7 +60,7 @@ const sendUserDataToBackend = (userData) => {
                  password: first_name,
                  role: "student"
              };
-             console.log(userData)
+             setEmail(userData.email);
              sendUserDataToBackend(userData);
             
            }}

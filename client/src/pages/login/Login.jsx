@@ -25,7 +25,7 @@ const Login = () => {
       toast.error("Please complete the reCAPTCHA challenge", {
           position: "top-center", autoClose: 3000,})
      }else{
-      await fetch("https://vercel-solar.vercel.app/users/login", {
+      await fetch("http://localhost:3001/users/login", {
         method: "PATCH",
         headers: {
           "content-type": "application/json",},
@@ -59,7 +59,7 @@ const Login = () => {
     const handleVerifyOTP = async (e) => {
       e.preventDefault();
       try {
-        const response = await fetch("https://vercel-solar.vercel.app/users/verify-otp", {
+        const response = await fetch("http://localhost:3001/users/verify-otp", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -179,10 +179,10 @@ const Login = () => {
                </div>
              </div>
              <div className="mt-6 flex justify-center">
-               <GoogleLoginButton />
+               <GoogleLoginButton setShowOtpForm={setShowOtpForm} email={email} setEmail={setEmail}/>
              </div>
              <div className="mt-6 flex justify-center">
-               <FacebookButton />            
+               <FacebookButton setShowOtpForm={setShowOtpForm} email={email} setEmail={setEmail}/>            
              </div>
            </div>
          </div>
