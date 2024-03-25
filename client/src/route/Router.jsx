@@ -20,6 +20,7 @@ import InstructorDashboard from "../component/InstructorDashboard/InstructorDash
 import Apply from "../component/StudentDashboard/Apply";
 import Shedule from "../component/InstructorDashboard/Shedule";
 import Enrolled from "../component/StudentDashboard/Enrolled";
+import Lobby from "../component/screens/Lobby";
 
 
 
@@ -87,6 +88,10 @@ const myRouter = createBrowserRouter([
         {
             path: 'enrolled',
             element: <Enrolled/>
+        },
+        {
+            path: 'lobby',
+            element: <Lobby />
         },
         {
             path: '/dashboard/settings',

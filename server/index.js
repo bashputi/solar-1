@@ -6,7 +6,6 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const { Server } = require("socket.io");
 const jwt = require('jsonwebtoken');
-const { server } = require("socket.io");
 const nodemailer = require("nodemailer");
 const { Client } = require('@vercel/postgres');
 const secretKey = process.env.ACCESS_TOKEN_SECRET;
@@ -22,11 +21,16 @@ const io = new Server(httpServer, {
             'https://versed-yard.surge.sh',
             'http://localhost:5173'
         ],
-        credentials: true // Corrected the spelling
+        credentials: true 
     }
 });
+
 io.on("connect", (socket) => {
     console.log(`Socket Connected`, socket.id);
+
+    socket.on("disconnect", () => {
+        console.log(`Socket Disconnected`, socket.id);
+    });
 });
 
 app.use(express.json());
@@ -35,18 +39,6 @@ app.use(cors());
 httpServer.listen(PORT, () => {
     console.log(`Server is running at port:${PORT}`);
 });
-
-// app.listen(PORT, () =>{
-//     console.log(`Server is running at port:${PORT}`);
-// });
-
-// app.use(cors({
-//     origin: [
-//         'https://versed-yard.surge.sh',
-//         'http://localhost:5173'
-//     ],
-//     Credential: true
-// }));
 
 app.get('/', (req, res) => {
     res.send("hello");

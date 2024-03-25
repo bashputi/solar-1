@@ -173,6 +173,8 @@ const Dashboard = () => {
         <hr className="h-0.5 mb-2 bg-white mx-4"/>
         <Link to="/" className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
         <IoHomeSharp className="mr-2"/>Home</Link>
+        <Link to="/dashboard/lobby" className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
+        <SiGooglemeet className="mr-2"/>Meeting</Link>
         <button onClick={handleLogOut} className="flex items-center px-5 py-2 text-gray-100 hover:bg-gray-700" >
         <IoLogOut className="mr-2"/>LogOut</button>
         <Link to="/dashboard/settings/profile" className="flex items-center px-5 py-2 mb-5 text-gray-100 hover:bg-gray-700">

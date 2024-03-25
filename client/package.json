@@ -31,6 +31,7 @@
     "react-social-login-buttons": "^4.1.0",
     "react-toastify": "^10.0.4",
     "reactjs-social-login": "^2.6.3",
+    "socket.io-client": "^4.7.5",
     "sort-by": "^0.0.2"
   },
   "devDependencies": {
