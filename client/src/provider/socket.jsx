@@ -1,30 +1,33 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-
 const SocketContext = createContext(null);
 
 export const useSocket = () => {
-    const socket = useContext(SocketContext)
-    return socket ;
+    const socket = useContext(SocketContext);
+    if (!socket) throw new Error("useSocket must be used within a SocketProvider");
+    return socket;
 };
 
-export const SocketProvider = (props) => {
-    const { children } = props;
+export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        const connection = io("http://localhost:3001");
-        console.log('socket connection', connection)
-        setSocket(connection);
+        const connectSocket = async () => {
+            try {
+                const connection = await io("http://localhost:3001");
+                console.log('socket connection', connection);
+                setSocket(connection);
+            } catch (error) {
+                console.error("Socket connection error:", error);
+            }
+        };
+        connectSocket();
     }, []);
 
-    socket?.on('connect_error', async(err) => {
-        console.log('error', err);
-      
-    })
-
     return (
-        <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+        <SocketContext.Provider value={socket}>
+            {socket ? children : null}
+        </SocketContext.Provider>
     );
 };

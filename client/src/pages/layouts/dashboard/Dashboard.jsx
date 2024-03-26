@@ -29,9 +29,7 @@ const Dashboard = () => {
   const [currentUser, refetch] = useUser();
   const Axios = useAxios();
   const [requestSent, setRequestSent] = useState(false);
-  console.log(requestSent, currentUser)
 
-  // const history = useHistory();
   
   const handleLogOut = async() => {
     await fetch("http://localhost:3001/users/logout", {

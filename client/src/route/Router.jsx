@@ -21,6 +21,7 @@ import Apply from "../component/StudentDashboard/Apply";
 import Shedule from "../component/InstructorDashboard/Shedule";
 import Enrolled from "../component/StudentDashboard/Enrolled";
 import Lobby from "../component/screens/Lobby";
+import Room from "../component/screens/Room";
 
 
 
@@ -92,6 +93,10 @@ const myRouter = createBrowserRouter([
         {
             path: 'lobby',
             element: <Lobby />
+        },
+        {
+            path: 'lobby/:id',
+            element: <Room />
         },
         {
             path: '/dashboard/settings',
