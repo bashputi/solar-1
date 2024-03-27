@@ -1,40 +1,53 @@
 import { useEffect, useState } from "react";
 import Peer from "peerjs";
+import ReactPlayer from 'react-player'
 
 const Room = () => {
     const [peer, setPeer] = useState(null);
     const [stream, setStream] = useState(null);
+    const [peerId, setPeerId] = useState(null);
+    const [cameraAvailable, setCameraAvailable] = useState(true); // Track camera availability
 
     useEffect(() => {
-        // Create a new Peer object
         const newPeer = new Peer();
+        newPeer.on('open', (id) => {
+            setPeerId(id);
+        });
 
-        // Set up event listeners for the Peer object
         newPeer.on("open", () => {
             console.log("Connected to Peer server");
         });
 
-        // Set the Peer object to state
         setPeer(newPeer);
 
-        // Access media devices
         const getMediaStream = async () => {
             try {
                 const mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
                     audio: true,
+                    video: false, // Initially set video to false
                 });
-                setStream(mediaStream);
+                
+                // Check if the user has a camera available
+                const hasVideoDevice = mediaStream.getVideoTracks().length > 0;
+                if (hasVideoDevice) {
+                    // If camera is available, request the video stream
+                    const videoStream = await navigator.mediaDevices.getUserMedia({
+                        video: true
+                    });
+                    setStream(videoStream);
+                } else {
+                    setCameraAvailable(false); // Set camera availability to false
+                    setStream(mediaStream); // Set stream without video
+                }
             } catch (error) {
                 console.error("Error accessing media devices:", error);
+                setCameraAvailable(false); // Set camera availability to false
             }
         };
 
         getMediaStream();
 
-        // Clean up function
         return () => {
-            // Close the Peer connection
             if (peer) {
                 peer.destroy();
             }
@@ -44,9 +57,13 @@ const Room = () => {
     return (
         <div>
             {stream ? (
-                <video srcObject={stream} autoPlay muted />
+                <div><ReactPlayer key={peerId} url={stream} playing /></div>
             ) : (
                 <div>Loading...</div>
+            )}
+    
+            {!cameraAvailable && (
+                <div>Video turned off</div>
             )}
         </div>
     );
