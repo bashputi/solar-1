@@ -28,6 +28,12 @@ const io = new Server(httpServer, {
 io.on("connect", (socket) => {
     console.log(`Socket Connected`, socket.id);
 
+    socket.on('join-room', (roomId, id) => {
+    console.log(`new user ${id} has joined the room ${roomId}`)
+    socket.join(roomId)
+    socket.broadcast.to(roomId).emit('user-connected', id)
+    });
+
     socket.on("disconnect", () => {
         console.log(`Socket Disconnected`, socket.id);
     });

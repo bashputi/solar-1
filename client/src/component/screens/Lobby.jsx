@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useUser from "../../hooks/useUser"
 import { useSocket } from "../../provider/socket";
-import { Peer } from "peerjs";
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from "react-router-dom";
 
@@ -10,34 +9,16 @@ const Lobby = () => {
     const [isButtonEnabled, setIsButtonEnabled] = useState(false); 
     const [currentUser] = useUser();
     const socket = useSocket();
-    const [peerId, setPeerId] = useState(null);
     const [roomId, setRoomId] = useState('');
     const navigate = useNavigate();
-  console.log(roomId)
 
-    useEffect(() => {
-      const peer = new Peer();
-      console.log(peer);
-
-      peer.on('open', (id) => {
-        console.log('My peer id:', id);
-        setPeerId(id);
-      });
-  
-      return () => {
-        peer.destroy();
-      };
-    }, []);
 
     const createAndJoin = () => {
       const roomId = uuidv4();
-      console.log(roomId);
       navigate(`/dashboard/lobby/${roomId}`)
     };
 
     const joinRoom = () => {
-      console.log(roomId)
-      console.log('joined')
       navigate(`/dashboard/lobby/${roomId}`)
     };
 
