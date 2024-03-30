@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import Peer from "peerjs";
 import ReactPlayer from 'react-player'
 import { useSocket } from "../../provider/socket";
+import usePlayer from "../../hooks/usePlayer";
+import Bottom from "./Bottom";
+import { cloneDeep } from 'lodash';
+
 
 const Room = () => {
     const [peer, setPeer] = useState(null);
@@ -10,6 +14,7 @@ const Room = () => {
     const [cameraAvailable, setCameraAvailable] = useState(true); 
     const socket = useSocket();
 
+
     const getRoomIdFromUrl = () => {
         const url = window.location.href;
         const parts = url.split('/');
@@ -17,6 +22,8 @@ const Room = () => {
         return roomId;
       };
     const roomId = getRoomIdFromUrl();
+    const {players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio, toggleVideo} = usePlayer(peerId, roomId);
+   
 
     useEffect(() => {
         const getMediaStream = async () => {
@@ -45,14 +52,15 @@ const Room = () => {
     }, []); 
     
     useEffect(() => {
-        const newPeer = new Peer();
+        const storedPeerId = localStorage.getItem('peerId');
+        const newPeer = new Peer(storedPeerId); 
         newPeer.on('open', (id) => {
+            localStorage.setItem('peerId', id);
             setPeerId(id);
             console.log("Connected to Peer server", id);
-            socket?.emit('join-room', roomId, id)
+            socket?.emit('join-room', roomId, id);
         });
         setPeer(newPeer);
-    
         return () => {
             if (newPeer) {
                 newPeer.destroy();
@@ -66,6 +74,18 @@ const Room = () => {
         const handleUserConnected = (newUser) => {
             console.log(`user-connected in room with userId ${newUser}`);
             const call = peer.call(newUser, stream);
+            
+            call.on('stream', (incomingStream) => {
+                console.log(`incoming stream from ${newUser}`);
+                setPlayers((prev) => ({
+                    ...prev,
+                    [newUser]: {
+                        url: incomingStream,
+                        muted: false,
+                        playing: true
+                    }
+                }))
+            })
 
         };
         socket.on('user-connected', handleUserConnected);
@@ -75,7 +95,7 @@ const Room = () => {
                 socket.off('user-connected', handleUserConnected);
             }
         };
-    }, [socket,stream,peer]);
+    }, [peer, setPlayers, socket, stream]);
 
     useEffect(() => {
         if(!peer || !stream) return;
@@ -85,19 +105,90 @@ const Room = () => {
 
             call.on('stream', (incomingStream) => {
                 console.log(`incoming stream from ${callerId}`)
+                setPlayers((prev) => ({
+                    ...prev,
+                    [callerId]: {
+                        url: incomingStream,
+                        muted: false,
+                        playing: true
+                    }
+                }))
             })
         })
-    } , [peer, stream]);
+    } , [peer, setPlayers, stream]);
+
+    useEffect(() => {
+        if(!stream || !peerId) return;
+        console.log(`setting my stream ${peerId}`)
+        setPlayers((prev) => ({
+            ...prev,
+            [peerId]: {
+                url: stream,
+                muted: false,
+                playing: true
+            }
+        }))
+    }, [peerId, setPlayers, stream]);
+
+    useEffect(() => {
+        if(!socket) return;
+        const handleToggleAudio = (id) => {
+            console.log(`user with id ${id} toggled audio`)
+            setPlayers((prev) => {
+                const copy = cloneDeep(prev);
+                copy[id].muted = !copy[id].muted;
+                return { ...copy };
+            });
+        }
+
+        const handleToggleVideo = (id) => {
+            console.log(`user with id ${id} toggled video`)
+            setPlayers((prev) => {
+                const copy = cloneDeep(prev);
+                copy[id].playing = !copy[id].playing;
+                return { ...copy };
+            });
+        }
+        socket.on(`user-toggle-audio`, handleToggleAudio)
+        socket.on(`user-toggle-Video`, handleToggleVideo)
+
+        return () => {
+            socket.off('user-toggle-audio', handleToggleAudio)
+            socket.off('user-toggle-Video', handleToggleVideo)
+        }
+
+    }, [setPlayers, socket])
+
     return (
+        <div className="">
+        <div >
+            {
+               !cameraAvailable ? ( playerHighlighted && (
+                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"> <span className="flex justify-center top-56 relative  font-bold text-2xl">Camera not available</span> <ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
+             )): ( playerHighlighted && (
+                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"><ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
+             ))
+            }
+        </div>
         <div>
-            {stream ? (
-                <div className="w-56 h-56"><ReactPlayer key={peerId} url={stream} playing /></div>
-            ) : (
-                <div>Loading...</div>
-            )}
-            {!cameraAvailable && (
-                <div className="w-56 h-56">Video turned off</div>
-            )}
+            {!cameraAvailable ? (stream &&
+                    Object.keys(nonHighlightedPlayers).map((playerId) => {
+                        const {url, playing, muted} = nonHighlightedPlayers[playerId]
+                        return <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400"> <span className="flex justify-center  mt-20">Camera not available</span><ReactPlayer url={url} playing={playing} muted={muted}/> </div>
+                    })) : (stream &&
+                        Object.keys(nonHighlightedPlayers).map((playerId) => {
+                            const {url, playing, muted} = nonHighlightedPlayers[playerId]
+                            return <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400"> <ReactPlayer url={url} playing={playing} muted={muted}/> </div>
+                        }))
+            }
+            
+            </div>
+            <div>
+           
+            </div>
+          <div className="flex justify-center h-[85vh] items-end">
+          <Bottom muted={playerHighlighted?.muted} playing={playerHighlighted?.playing} toggleAudio={toggleAudio} toggleVideo={toggleVideo} cameraAvailable={cameraAvailable}/>
+          </div>
         </div>
     );
 };

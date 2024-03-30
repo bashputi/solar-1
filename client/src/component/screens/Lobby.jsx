@@ -1,14 +1,14 @@
 import { useState } from "react";
-import useUser from "../../hooks/useUser"
-import { useSocket } from "../../provider/socket";
+// import useUser from "../../hooks/useUser"
+// import { useSocket } from "../../provider/socket";
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from "react-router-dom";
 
 
 const Lobby = () => {
     const [isButtonEnabled, setIsButtonEnabled] = useState(false); 
-    const [currentUser] = useUser();
-    const socket = useSocket();
+    // const [currentUser] = useUser();
+    // const socket = useSocket();
     const [roomId, setRoomId] = useState('');
     const navigate = useNavigate();
 

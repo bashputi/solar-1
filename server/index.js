@@ -29,15 +29,29 @@ io.on("connect", (socket) => {
     console.log(`Socket Connected`, socket.id);
 
     socket.on('join-room', (roomId, id) => {
-    console.log(`new user ${id} has joined the room ${roomId}`)
-    socket.join(roomId)
-    socket.broadcast.to(roomId).emit('user-connected', id)
+        console.log(`new user ${id} has joined the room ${roomId}`)
+        socket.join(roomId)
+        socket.broadcast.to(roomId).emit('user-connected', id)
+    });
+
+    socket.on('user-toggle-audio', (id, roomId) => {
+        socket.join(roomId)
+        socket.broadcast.to(roomId).emit('user-toggle-audio', id)
+    });
+
+    socket.on('user-toggle-video', (id, roomId) => {
+        socket.join(roomId)
+        socket.broadcast.to(roomId).emit('user-toggle-video', id)
     });
 
     socket.on("disconnect", () => {
         console.log(`Socket Disconnected`, socket.id);
+        // Close the socket connection when the user disconnects
+        socket.disconnect();
     });
-});
+}
+);
+
 
 app.use(express.json());
 app.use(cors());

@@ -1,0 +1,49 @@
+import { cloneDeep } from 'lodash';
+import { useState } from "react";
+import { useSocket } from '../provider/socket';
+
+const usePlayer = (peerId, roomId) => {
+    const socket = useSocket(); 
+    console.log(socket)
+    const [players, setPlayers] = useState({});
+    const playersCopy = cloneDeep(players);
+    const playerHighlighted = playersCopy[peerId];
+    delete playersCopy[peerId];
+    const nonHighlightedPlayers = playersCopy;
+
+    const toggleAudio = () => {
+        console.log('toggled audio');
+        setPlayers((prev) => {
+            const copy = cloneDeep(prev);
+            copy[peerId].muted = !copy[peerId].muted;
+            return { ...copy };
+        });
+
+        if (socket) {
+            socket.emit('user-toggled-audio', peerId, roomId);
+        } else {
+            console.warn('Socket is not available.');
+        }
+    };
+
+    const toggleVideo = () => {
+        console.log('toggled video');
+        setPlayers((prev) => {
+            const copy = cloneDeep(prev);
+            copy[peerId].playing = !copy[peerId].playing;
+            return { ...copy };
+        });
+
+        if (socket) {
+            socket.emit('user-toggled-video', peerId, roomId);
+        } else {
+            console.warn('Socket is not available.');
+        }
+    };
+
+   
+
+    return { players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio, toggleVideo };
+};
+
+export default usePlayer;
