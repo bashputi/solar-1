@@ -64,7 +64,7 @@ const Dashboard = () => {
     return (
         <div className="flex h-screen bg-gray-200">
   {/* sidebar */}
-  <div className="hidden md:flex flex-col w-64 bg-gray-800">
+  <div className="flex flex-col w-64 bg-gray-800">
     <div className=" py-3 bg-gray-900">
     <div className="flex justify-center">
       <img className="w-32 h-32 rounded-full" src={currentUser?.profileimage || 'https://i.ibb.co/G7b1pnb/blank-avatar-photo-place-holder-600nw-1095249842.webp'} alt="profile image" />

@@ -1,15 +1,19 @@
 import { cloneDeep } from 'lodash';
 import { useState } from "react";
 import { useSocket } from '../provider/socket';
+import { useNavigate } from "react-router-dom";
 
-const usePlayer = (peerId, roomId) => {
+
+const usePlayer = (peerId, roomId, peer) => {
+   
     const socket = useSocket(); 
-    console.log(socket)
+    const navigate = useNavigate();
     const [players, setPlayers] = useState({});
     const playersCopy = cloneDeep(players);
     const playerHighlighted = playersCopy[peerId];
     delete playersCopy[peerId];
     const nonHighlightedPlayers = playersCopy;
+
 
     const toggleAudio = () => {
         console.log('toggled audio');
@@ -18,12 +22,8 @@ const usePlayer = (peerId, roomId) => {
             copy[peerId].muted = !copy[peerId].muted;
             return { ...copy };
         });
-
-        if (socket) {
+        console.log(peerId, roomId)
             socket.emit('user-toggled-audio', peerId, roomId);
-        } else {
-            console.warn('Socket is not available.');
-        }
     };
 
     const toggleVideo = () => {
@@ -33,17 +33,20 @@ const usePlayer = (peerId, roomId) => {
             copy[peerId].playing = !copy[peerId].playing;
             return { ...copy };
         });
-
-        if (socket) {
             socket.emit('user-toggled-video', peerId, roomId);
-        } else {
-            console.warn('Socket is not available.');
-        }
     };
+
+    const leaveRoom = () => {
+        socket.emit('user-leave', peerId, roomId)
+        peer?.disconnect();
+        console.log('leaved')
+        navigate('/dashboard/lobby')
+        // window.location.reload();
+    }
 
    
 
-    return { players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio, toggleVideo };
+    return { players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio,leaveRoom, toggleVideo, };
 };
 
 export default usePlayer;

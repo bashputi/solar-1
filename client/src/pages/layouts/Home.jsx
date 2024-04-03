@@ -4,14 +4,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import useAuth from "../../hooks/useAuth";
 
 
-
-
 const Home = () => {
     const navigate = useNavigate();
    const [data] = useAuth();
-   console.log(data)
     
-
    const handleLogOut = async() => {
     await fetch("http://localhost:3001/users/logout", {
       method: "POST",
@@ -29,9 +25,7 @@ const Home = () => {
  <div>
     <h1 className="text-5xl text-center mt-28 font-bold">  Welcome home</h1>
            <div className='text-center mt-5'>
-          
             <span className="text-green-700 font-bold text-2xl"> {data ? data.username : "No logged in user"}</span>
-      
         </div>
       <div className="flex justify-center">
       {
@@ -46,7 +40,6 @@ const Home = () => {
       }
       </div>
  </div>
-
     );
 };
 

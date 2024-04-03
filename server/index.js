@@ -1,10 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const http = require("http");
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
-const { Server } = require("socket.io");
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
 const { Client } = require('@vercel/postgres');
@@ -14,51 +12,19 @@ const pool = require("./db");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: [
-            'https://versed-yard.surge.sh',
-            'http://localhost:5173'
-        ],
-        credentials: true 
-    }
-});
-
-io.on("connect", (socket) => {
-    console.log(`Socket Connected`, socket.id);
-
-    socket.on('join-room', (roomId, id) => {
-        console.log(`new user ${id} has joined the room ${roomId}`)
-        socket.join(roomId)
-        socket.broadcast.to(roomId).emit('user-connected', id)
-    });
-
-    socket.on('user-toggle-audio', (id, roomId) => {
-        socket.join(roomId)
-        socket.broadcast.to(roomId).emit('user-toggle-audio', id)
-    });
-
-    socket.on('user-toggle-video', (id, roomId) => {
-        socket.join(roomId)
-        socket.broadcast.to(roomId).emit('user-toggle-video', id)
-    });
-
-    socket.on("disconnect", () => {
-        console.log(`Socket Disconnected`, socket.id);
-        // Close the socket connection when the user disconnects
-        socket.disconnect();
-    });
-}
-);
-
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://versed-yard.surge.sh',
+        'http://localhost:5173'
+    ],
+    credentials: true 
+}));
 
-httpServer.listen(PORT, () => {
-    console.log(`Server is running at port:${PORT}`);
-});
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 
 app.get('/', (req, res) => {
     res.send("hello");

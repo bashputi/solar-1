@@ -9,13 +9,13 @@ const StudentDashboard = () => {
             count: 1
           },
         {
-            id: 1,
+            id: 2,
             status: "Active Courses",
             image: 'https://i.ibb.co/ZLZnhgd/Screenshot-2024-03-03-095331-removebg-preview.png',
             count: 1
           },
         {
-            id: 1,
+            id: 3,
             status: "Completed Courses",
             image: 'https://i.ibb.co/vqv63HB/Screenshot-2024-03-03-095429-removebg-preview.png',
             count: 0
@@ -28,7 +28,7 @@ const StudentDashboard = () => {
                 <div className="flex my-10">
                     {
                         course.map((item) => (
-                            <div key="item.id" className="border-boxborder-solid px-12 p-12 grid justify-center  mr-10 w-96  border-2 border-indigo-600">
+                            <div key={item.id} className="border-boxborder-solid px-12 p-12 grid justify-center  mr-10 w-96  border-2 border-indigo-600">
                                <div className="flex justify-center"> <img className="w-12" src={item.image} alt="image" /></div>
                                 <p className="text-center text-5xl font-bold my-8">{item.count}</p>
                                 <p className="text-gray-500 font-semibold" >{item.status}</p>

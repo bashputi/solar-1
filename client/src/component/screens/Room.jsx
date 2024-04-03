@@ -3,8 +3,9 @@ import Peer from "peerjs";
 import ReactPlayer from 'react-player'
 import { useSocket } from "../../provider/socket";
 import usePlayer from "../../hooks/usePlayer";
-import Bottom from "./Bottom";
 import { cloneDeep } from 'lodash';
+import Bottom from "./Bottom";
+
 
 
 const Room = () => {
@@ -20,11 +21,13 @@ const Room = () => {
         const parts = url.split('/');
         const roomId = parts[parts.length - 1];
         return roomId;
-      };
+    };
+    
     const roomId = getRoomIdFromUrl();
-    const {players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio, toggleVideo} = usePlayer(peerId, roomId);
-   
+    const { players, leaveRoom, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio, toggleVideo } = usePlayer(peerId, roomId, peer);
+    const [users, setUsers] = useState({});
 
+    // okay 
     useEffect(() => {
         const getMediaStream = async () => {
             try {
@@ -47,14 +50,17 @@ const Room = () => {
                 setCameraAvailable(false);
             }
         };
-    
+
         getMediaStream();
     }, []); 
     
+    // okay 
     useEffect(() => {
         const storedPeerId = localStorage.getItem('peerId');
         const newPeer = new Peer(storedPeerId); 
+        console.log(newPeer)
         newPeer.on('open', (id) => {
+            console.log(id)
             localStorage.setItem('peerId', id);
             setPeerId(id);
             console.log("Connected to Peer server", id);
@@ -68,7 +74,6 @@ const Room = () => {
         };
     }, [roomId, socket]); 
 
- 
     useEffect(() => {
         if (!socket) return; 
         const handleUserConnected = (newUser) => {
@@ -97,7 +102,8 @@ const Room = () => {
         };
     }, [peer, setPlayers, socket, stream]);
 
-    useEffect(() => {
+
+        useEffect(() => {
         if(!peer || !stream) return;
         peer.on('call', (call) => {
             const {peer: callerId} = call;
@@ -117,6 +123,7 @@ const Room = () => {
         })
     } , [peer, setPlayers, stream]);
 
+    // okay
     useEffect(() => {
         if(!stream || !peerId) return;
         console.log(`setting my stream ${peerId}`)
@@ -131,64 +138,64 @@ const Room = () => {
     }, [peerId, setPlayers, stream]);
 
     useEffect(() => {
-        if(!socket) return;
+        if (!socket) return;
+     
         const handleToggleAudio = (id) => {
-            console.log(`user with id ${id} toggled audio`)
+            console.log(`user with id ${id} toggled audio`);
             setPlayers((prev) => {
                 const copy = cloneDeep(prev);
                 copy[id].muted = !copy[id].muted;
                 return { ...copy };
             });
-        }
+        };
 
         const handleToggleVideo = (id) => {
-            console.log(`user with id ${id} toggled video`)
+            console.log(`user with id ${id} toggled video`);
             setPlayers((prev) => {
                 const copy = cloneDeep(prev);
                 copy[id].playing = !copy[id].playing;
                 return { ...copy };
             });
-        }
-        socket.on(`user-toggle-audio`, handleToggleAudio)
-        socket.on(`user-toggle-Video`, handleToggleVideo)
+        };
+
+        const handleUserLeave = (id) => {
+            console.log(`user ${id} is leaving the room`);
+            users[id]?.close();
+            const playersCopy = cloneDeep(players);
+            delete playersCopy[id];
+            setPlayers(playersCopy);
+        };
+
+        socket.on(`user-toggled-audio`, handleToggleAudio);
+        socket.on(`user-toggled-video`, handleToggleVideo);
+        socket.on(`user-leave`, handleUserLeave);
 
         return () => {
-            socket.off('user-toggle-audio', handleToggleAudio)
-            socket.off('user-toggle-Video', handleToggleVideo)
-        }
-
-    }, [setPlayers, socket])
+            socket.off('user-toggled-audio', handleToggleAudio);
+            socket.off('user-toggled-video', handleToggleVideo);
+            socket.off('user-leave', handleUserLeave);
+        };
+    }, [players, setPlayers, socket, users]);
 
     return (
         <div className="">
-        <div >
-            {
-               !cameraAvailable ? ( playerHighlighted && (
-                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"> <span className="flex justify-center top-56 relative  font-bold text-2xl">Camera not available</span> <ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
-             )): ( playerHighlighted && (
-                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"><ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
-             ))
-            }
-        </div>
-        <div>
-            {!cameraAvailable ? (stream &&
-                    Object.keys(nonHighlightedPlayers).map((playerId) => {
-                        const {url, playing, muted} = nonHighlightedPlayers[playerId]
-                        return <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400"> <span className="flex justify-center  mt-20">Camera not available</span><ReactPlayer url={url} playing={playing} muted={muted}/> </div>
-                    })) : (stream &&
-                        Object.keys(nonHighlightedPlayers).map((playerId) => {
-                            const {url, playing, muted} = nonHighlightedPlayers[playerId]
-                            return <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400"> <ReactPlayer url={url} playing={playing} muted={muted}/> </div>
-                        }))
-            }
-            
+            <div >
+                {!cameraAvailable && playerHighlighted && (
+                    <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700">
+                        <ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} />
+                    </div>
+                )}
             </div>
             <div>
-           
+                {stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
+                    <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400">
+                        <ReactPlayer url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} />
+                    </div>
+                ))}
             </div>
-          <div className="flex justify-center h-[85vh] items-end">
-          <Bottom muted={playerHighlighted?.muted} playing={playerHighlighted?.playing} toggleAudio={toggleAudio} toggleVideo={toggleVideo} cameraAvailable={cameraAvailable}/>
-          </div>
+            <div className="flex justify-center h-[85vh] items-end">
+                <Bottom muted={playerHighlighted?.muted} playing={playerHighlighted?.playing} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveRoom={leaveRoom} cameraAvailable={cameraAvailable}/>
+            </div>
         </div>
     );
 };
