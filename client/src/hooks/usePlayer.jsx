@@ -41,7 +41,7 @@ const usePlayer = (peerId, roomId, peer) => {
         peer?.disconnect();
         console.log('leaved')
         navigate('/dashboard/lobby')
-        // window.location.reload();
+        window.location.reload();
     }
 
    

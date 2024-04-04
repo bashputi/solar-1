@@ -188,7 +188,7 @@ const Room = () => {
                !cameraAvailable ? ( playerHighlighted && (
                 <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"> <span className="flex justify-center top-56 relative  font-bold text-2xl">Camera not available</span> <ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
              )): ( playerHighlighted && (
-                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"><ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
+                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] "><ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
              ))
             }
             </div>
@@ -200,7 +200,7 @@ const Room = () => {
                 </div>
             ))) :
             ( stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
-                <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400">
+                <div key={playerId} className="w-56 h-56 absolute mb-2 ">
                     <ReactPlayer url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} />
                 </div>
             )))

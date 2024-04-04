@@ -38,7 +38,7 @@ const Register = () => {
                   password: data.confirmpassword,
                   role: "instructor"
               }
-              fetch('http://localhost:3001/users/register',{
+              fetch('https://vercel-solar.vercel.app/users/register',{
                   method: 'POST',
                   headers: {
                       'content-type': 'application/json'

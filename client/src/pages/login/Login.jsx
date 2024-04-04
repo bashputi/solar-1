@@ -25,7 +25,7 @@ const Login = () => {
       toast.error("Please complete the reCAPTCHA challenge", {
           position: "top-center", autoClose: 3000,})
      }else{
-      await fetch("http://localhost:3001/users/login", {
+      await fetch("https://vercel-solar.vercel.app/users/login", {
         method: "PATCH",
         headers: {
           "content-type": "application/json",},
@@ -59,7 +59,7 @@ const Login = () => {
     const handleVerifyOTP = async (e) => {
       e.preventDefault();
       try {
-        const response = await fetch("http://localhost:3001/users/verify-otp", {
+        const response = await fetch("https://vercel-solar.vercel.app/users/verify-otp", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

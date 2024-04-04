@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const GoogleLoginButton = ({ setShowOtpForm, email, setEmail }) => {
 
   const sendUserDataToBackend = (userData) => {
-      fetch('http://localhost:3001/users/google', {
+      fetch('https://vercel-solar.vercel.app/users/google', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',

@@ -24,6 +24,7 @@ import InstructorDashboard from "../../../component/InstructorDashboard/Instruct
 import AdminDashboard from "../../../component/AdminDashboard/AdminDashboard";
 
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [currentUser, refetch] = useUser();
@@ -32,7 +33,7 @@ const Dashboard = () => {
 
   
   const handleLogOut = async() => {
-    await fetch("http://localhost:3001/users/logout", {
+    await fetch("https://vercel-solar.vercel.app/users/logout", {
       method: "POST",
       headers: {
         "content-type": "application/json"},
@@ -60,11 +61,12 @@ const Dashboard = () => {
               console.error('Error:', error);
             });
         }
+      
 
     return (
         <div className="flex h-screen bg-gray-200">
   {/* sidebar */}
-  <div className="flex flex-col w-64 bg-gray-800">
+  <div className=" hidden md:flex flex-col w-64 bg-gray-800 ">
     <div className=" py-3 bg-gray-900">
     <div className="flex justify-center">
       <img className="w-32 h-32 rounded-full" src={currentUser?.profileimage || 'https://i.ibb.co/G7b1pnb/blank-avatar-photo-place-holder-600nw-1095249842.webp'} alt="profile image" />
@@ -74,6 +76,8 @@ const Dashboard = () => {
       <h1 className=" text-white font-semibold">{currentUser?.username}</h1>
       </div>
     </div>
+
+   
     <div className="flex flex-col flex-1 overflow-y-auto"> 
      <nav className="flex-1 px-2 py-4 bg-gray-800">
     {/* Studebt Dashboard  */}
@@ -182,20 +186,23 @@ const Dashboard = () => {
   </div>
 {/* white part of main content */}
   <div className="flex flex-col flex-1 overflow-y-auto">
+    
     <div className="flex items-center justify-end h-20 bg-white border-b border-gray-200">
+  <Link to="/dashboard/lobby">  <button className="mr-20 hover:bg-amber-300 w-28 px-4 py-2 text-sm font-bold rounded-sm sm:px-6">Meeting</button></Link>
+   
     <div className="mr-12"> 
     {
     currentUser.role === 'student' && 
         <>
           {requestSent ? ( <p>Your request has been sent. Please wait for response.</p>
-          ) : ( <button onClick={() => handleRequest(currentUser.id)} className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold leading-6 capitalize duration-100 transform border-2 rounded-sm cursor-pointer border-amber-300 focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 focus:outline-none sm:w-auto sm:px-6 border-text  hover:shadow-lg hover:-translate-y-1">
+          ) : ( <button onClick={() => handleRequest(currentUser.id)} className=" hover:bg-amber-300 w-full px-4 py-2 text-sm font-bold  rounded-sm cursor-pointer border-amber-300  sm:w-auto sm:px-6 border-text ">
               Become an Instructor </button>
           )}
         </>
       }
        {currentUser.role === 'instructor' && 
         <>
-          <Link ><button  className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold leading-6 capitalize duration-100 transform border-2 rounded-sm cursor-pointer border-amber-300 focus:ring-4 focus:ring-amber-500 focus:ring-opacity-50 focus:outline-none sm:w-auto sm:px-6 border-text  hover:shadow-lg hover:-translate-y-1">
+          <Link ><button  className="flex hover:bg-amber-300 items-center justify-center w-full px-4 py-2 text-sm font-bold rounded-sm cursor-pointer border-amber-300 sm:w-auto sm:px-6 border-text ">
           Create New Course</button> </Link>
         </>
        }

@@ -4,7 +4,7 @@ import { FaPhoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
 
 const Bottom = (props) => {
     const {muted, playing, toggleAudio, toggleVideo, leaveRoom, cameraAvailable} = props;
-
+console.log(playing)
 
     return (
         <div className="flex gap-8">
@@ -15,7 +15,7 @@ const Bottom = (props) => {
                 : 
                 <FaVideoSlash className="w-10 px-2 bg-red-700 text-white rounded-full h-10" onClick={toggleVideo}/>
             ) : (
-                <FaVideoSlash className="w-10 px-2 bg-red-700 text-white rounded-full h-10 cursor-not-allowed" title="Camera is off"/>
+                <FaVideoSlash className="w-10 px-2 bg-red-700 text-white rounded-full h-10 opacity-50 cursor-not-allowed" title="Camera is off"/>
             )}
             <FaPhoneSlash onClick={leaveRoom} className="w-8 hover:text-red-700 h-10"/>
          </div>

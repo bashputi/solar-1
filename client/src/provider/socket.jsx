@@ -16,7 +16,8 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         const connectSocket =  () => {
-            const connection = io("http://localhost:3000");
+            // const connection = io("http://localhost:3000");
+            const connection = io("https://jelly-canary-date.glitch.me");
     
             connection.on('error', (error) => {
                 console.error("Socket error:", error);
