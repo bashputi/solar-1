@@ -180,24 +180,19 @@ const Room = () => {
     return (
         <div className="">
             <div >
-            {cameraAvailable ?
+            {
                 ( playerHighlighted && (
-                <div ><ReactPlayer className="w-56  mt-10 h-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div> ))
-                : ( playerHighlighted && (
-                    <div ><span className="block font-bold text-xl text-center">camera not available</span><ReactPlayer className="w-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div> ))
+                <div style={{ transform: 'scaleX(-1)' }} className="w-full md:w-[60vw]"><ReactPlayer className=" bg-red-400 mt-10 h-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div> ))
             }
             </div>
             <div className="flex gap-2">
-                { cameraAvailable ?
+                {
               
             ( stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
-                    <ReactPlayer key={playerId} className="max-w-36 block max-h-36" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} />)))
-                    :  ( stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
-                        <div  key={playerId}><span className="absolute text-center pl-5">camera not available</span>  <ReactPlayer className="max-w-48  max-h-48 bg-yellow-400" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} /></div>
-                       )))
+                   <div  key={playerId} style={{ transform: 'scaleX(-1)' }}> <ReactPlayer className="max-w-36 block max-h-36 bg-yellow-400" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted}/> </div>)))
                 }
             </div>
-            <div className="flex justify-center mt-10">
+            <div className="flex justify-center mt-10 items-end">
                 <Bottom muted={playerHighlighted?.muted} playing={playerHighlighted?.playing} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveRoom={leaveRoom} cameraAvailable={cameraAvailable}/>
             </div>
         </div>
