@@ -33,6 +33,7 @@ const usePlayer = (peerId, roomId, peer) => {
             copy[peerId].playing = !copy[peerId].playing;
             return { ...copy };
         });
+        console.log(peerId, roomId)
             socket.emit('user-toggled-video', peerId, roomId);
     };
 

@@ -31,28 +31,24 @@ const Room = () => {
     useEffect(() => {
         const getMediaStream = async () => {
             try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const hasCamera = devices.some(device => device.kind === 'videoinput');
+    
                 const mediaStream = await navigator.mediaDevices.getUserMedia({
                     audio: true,
-                    video: false,
+                    video: hasCamera, 
                 });
-                const hasVideoDevice = mediaStream.getVideoTracks().length > 0;
-                if (hasVideoDevice) {
-                    const videoStream = await navigator.mediaDevices.getUserMedia({
-                        video: true
-                    });
-                    setStream(videoStream);
-                } else {
-                    setCameraAvailable(false);
-                    setStream(mediaStream);
-                }
+                setCameraAvailable(hasCamera)
+                setStream(mediaStream);
             } catch (error) {
                 console.error("Error accessing media devices:", error);
-                setCameraAvailable(false);
+                
+                setStream(null); 
             }
         };
-
+    
         getMediaStream();
-    }, []); 
+    }, []);
     
     // okay 
     useEffect(() => {
@@ -184,29 +180,24 @@ const Room = () => {
     return (
         <div className="">
             <div >
-            {
-               !cameraAvailable ? ( playerHighlighted && (
-                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] bg-pink-700"> <span className="flex justify-center top-56 relative  font-bold text-2xl">Camera not available</span> <ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
-             )): ( playerHighlighted && (
-                <div className="w-[76vw] ml-10 absolute mt-10 h-[70vh] "><ReactPlayer url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div>
-             ))
+            {cameraAvailable ?
+                ( playerHighlighted && (
+                <div ><ReactPlayer className="w-56  mt-10 h-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div> ))
+                : ( playerHighlighted && (
+                    <div ><span className="block font-bold text-xl text-center">camera not available</span><ReactPlayer className="w-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div> ))
             }
             </div>
-            <div>
-                {
-               !cameraAvailable ? (stream &&  stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
-                <div key={playerId} className="w-56 h-56 absolute mb-2 bg-pink-400"> <span className="flex justify-center  mt-20">Camera not available</span>
-                    <ReactPlayer url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} />
-                </div>
-            ))) :
+            <div className="flex gap-2">
+                { cameraAvailable ?
+              
             ( stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
-                <div key={playerId} className="w-56 h-56 absolute mb-2 ">
-                    <ReactPlayer url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} />
-                </div>
-            )))
+                    <ReactPlayer key={playerId} className="max-w-36 block max-h-36" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} />)))
+                    :  ( stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
+                        <div  key={playerId}><span className="absolute text-center pl-5">camera not available</span>  <ReactPlayer className="max-w-48  max-h-48 bg-yellow-400" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} /></div>
+                       )))
                 }
             </div>
-            <div className="flex justify-center h-[85vh] items-end">
+            <div className="flex justify-center mt-10">
                 <Bottom muted={playerHighlighted?.muted} playing={playerHighlighted?.playing} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveRoom={leaveRoom} cameraAvailable={cameraAvailable}/>
             </div>
         </div>

@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(cors({
     origin: [
+        'https://day-2-a560d.web.app',
         'https://versed-yard.surge.sh',
         'http://localhost:5173'
     ],
