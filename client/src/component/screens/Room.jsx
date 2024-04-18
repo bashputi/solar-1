@@ -178,18 +178,18 @@ const Room = () => {
     }, [players, setPlayers, socket, users]);
 
     return (
-        <div className="">
-            <div >
+        <div >
+            <div className="">
             {
                 ( playerHighlighted && (
-                <div style={{ transform: 'scaleX(-1)' }} className="w-full md:w-[60vw]"><ReactPlayer className=" bg-red-400 mt-10 h-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} /></div> ))
+                <div  className="bg-red-400 w-[60vw] mx-auto"><ReactPlayer className=" mt-10 h-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} style={{ transform: 'scaleX(-1)' }}/></div> ))
             }
             </div>
-            <div className="flex gap-2">
+            <div className="flex justify-center gap-2">
                 {
               
             ( stream && Object.keys(nonHighlightedPlayers).map((playerId) => (
-                   <div  key={playerId} style={{ transform: 'scaleX(-1)' }}> <ReactPlayer className="max-w-36 block max-h-36 bg-yellow-400" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted}/> </div>)))
+                   <div  key={playerId} > <ReactPlayer className="max-w-36 block max-h-36 bg-yellow-400" url={nonHighlightedPlayers[playerId].url} playing={nonHighlightedPlayers[playerId].playing} muted={nonHighlightedPlayers[playerId].muted} style={{ transform: 'scaleX(-1)' }}/> </div>)))
                 }
             </div>
             <div className="flex justify-center mt-10 items-end">
