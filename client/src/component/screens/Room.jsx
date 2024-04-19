@@ -182,7 +182,7 @@ const Room = () => {
             <div className="">
             {
                 ( playerHighlighted && (
-                <div  className="bg-red-400 w-[60vw] mx-auto"><ReactPlayer className=" mt-10 h-56 mb-5" url={playerHighlighted.url} playing={playerHighlighted.playing} muted={playerHighlighted.muted} style={{ transform: 'scaleX(-1)' }}/></div> ))
+                <div  className="bg-red-400 w-[60vw] mx-auto"><ReactPlayer controls={true} className=" mt-10 h-56 mb-5" url={playerHighlighted.url}  playing={playerHighlighted.playing} muted={playerHighlighted.muted} style={{ transform: 'scaleX(-1)' }}/></div> ))
             }
             </div>
             <div className="flex justify-center gap-2">

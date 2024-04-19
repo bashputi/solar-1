@@ -45,7 +45,6 @@ const usePlayer = (peerId, roomId, peer) => {
         window.location.reload();
     }
 
-   
 
     return { players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio,leaveRoom, toggleVideo, };
 };
