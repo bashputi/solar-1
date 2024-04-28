@@ -24,7 +24,6 @@ import Lobby from "../component/screens/Lobby";
 import Room from "../component/screens/Room";
 
 
-
 const myRouter = createBrowserRouter([
 {
     path: '/',

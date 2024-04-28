@@ -4,7 +4,7 @@ import { useSocket } from '../provider/socket';
 import { useNavigate } from "react-router-dom";
 
 
-const usePlayer = (peerId, roomId, peer) => {
+const usePlayer = (peerId, roomId, peer, screen, setScreen, setStream) => {
    
     const socket = useSocket(); 
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ const usePlayer = (peerId, roomId, peer) => {
     delete playersCopy[peerId];
     const nonHighlightedPlayers = playersCopy;
 
-
+console.log(screen)
     const toggleAudio = () => {
         console.log('toggled audio');
         setPlayers((prev) => {
@@ -30,11 +30,11 @@ const usePlayer = (peerId, roomId, peer) => {
         console.log('toggled video');
         setPlayers((prev) => {
             const copy = cloneDeep(prev);
-            copy[peerId].playing = !copy[peerId].playing;
+            copy[peerId].toggle = !copy[peerId].toggle;
             return { ...copy };
         });
-        console.log(peerId, roomId)
-            socket.emit('user-toggled-video', peerId, roomId);
+        console.log(peerId, roomId);
+        socket.emit('user-toggled-video', peerId, roomId);
     };
 
     const leaveRoom = () => {
@@ -45,8 +45,30 @@ const usePlayer = (peerId, roomId, peer) => {
         window.location.reload();
     }
 
+    const shareScreen = async () => {
+        console.log('screen share hi');
+        try {
+            const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                video: true,
+            });
+            setScreen(screenStream);
+            // const serializedTracks = screenStream.getTracks().map(track => ({
+            //     id: track.id,
+            //     kind: track.kind,
+            //     label: track.label,
+            //     enabled: track.enabled,
+            // }));
+            const serializedTracksJSON = JSON.stringify(screenStream);
+            console.log(serializedTracksJSON)
+            socket.emit('screen-share', peerId, roomId, serializedTracksJSON);
+        } catch (error) {
+            console.error("Error starting screen sharing:", error);
+        }
+    };
+    
 
-    return { players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio,leaveRoom, toggleVideo, };
+
+    return { players, setPlayers, playerHighlighted, nonHighlightedPlayers, toggleAudio,leaveRoom, toggleVideo, shareScreen};
 };
 
 export default usePlayer;
